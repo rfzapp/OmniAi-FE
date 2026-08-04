@@ -1,20 +1,47 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import Link from "next/link";
 import { Avatar, AvatarFallback } from "@/components/atoms/Avatar";
 import { Button } from "@/components/atoms/Button";
 import { Input } from "@/components/atoms/Input";
 import { Label } from "@/components/ui/label";
-import { useProfile } from "@/features/profile/hooks/useProfile";
+import { useAuthStore, type AuthUser } from "@/store/useAuthStore";
+import { ROUTES } from "@/constants/routes";
 
 export function ProfileForm() {
-  const profile = useProfile();
-  const [name, setName] = useState("");
-  const [saved, setSaved] = useState(false);
+  const user = useAuthStore((s) => s.user);
 
-  useEffect(() => {
-    if (profile) setName(profile.name);
-  }, [profile]);
+  return (
+    <div className="flex flex-col gap-4 px-4 py-4">
+      <div className="flex items-center gap-3">
+        <Avatar size="lg">
+          <AvatarFallback className="bg-brand-100 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300">
+            {user?.avatarInitials ?? "?"}
+          </AvatarFallback>
+        </Avatar>
+        <Button variant="outline" size="sm" type="button" disabled={!user}>
+          Change avatar
+        </Button>
+      </div>
+
+      {user ? (
+        <ProfileFields user={user} />
+      ) : (
+        <p className="text-sm text-muted-foreground">
+          <Link href={ROUTES.login} className="font-medium text-brand-600 hover:underline">
+            Log in
+          </Link>{" "}
+          to edit your profile.
+        </p>
+      )}
+    </div>
+  );
+}
+
+function ProfileFields({ user }: { user: AuthUser }) {
+  const [name, setName] = useState(user.name);
+  const [saved, setSaved] = useState(false);
 
   function handleSave() {
     setSaved(true);
@@ -22,18 +49,7 @@ export function ProfileForm() {
   }
 
   return (
-    <div className="flex flex-col gap-4 px-4 py-4">
-      <div className="flex items-center gap-3">
-        <Avatar size="lg">
-          <AvatarFallback className="bg-brand-100 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300">
-            {profile?.avatarInitials ?? "…"}
-          </AvatarFallback>
-        </Avatar>
-        <Button variant="outline" size="sm" type="button">
-          Change avatar
-        </Button>
-      </div>
-
+    <>
       <div className="grid gap-1.5">
         <Label htmlFor="profile-name">Display name</Label>
         <Input
@@ -46,7 +62,7 @@ export function ProfileForm() {
 
       <div className="grid gap-1.5">
         <Label htmlFor="profile-email">Email</Label>
-        <Input id="profile-email" value={profile?.email ?? ""} disabled className="max-w-sm" />
+        <Input id="profile-email" value={user.email} disabled className="max-w-sm" />
       </div>
 
       <div>
@@ -54,6 +70,6 @@ export function ProfileForm() {
           {saved ? "Saved" : "Save changes"}
         </Button>
       </div>
-    </div>
+    </>
   );
 }

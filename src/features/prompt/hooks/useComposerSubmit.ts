@@ -11,8 +11,6 @@ interface UseComposerSubmitOptions {
 export function useComposerSubmit({ onSend, disabled }: UseComposerSubmitOptions) {
   const [value, setValue] = useState("");
   const [attachments, setAttachments] = useState<Attachment[]>([]);
-  const [webSearchEnabled, setWebSearchEnabled] = useState(false);
-  const [reasoningEnabled, setReasoningEnabled] = useState(false);
 
   const submit = useCallback(() => {
     const trimmed = value.trim();
@@ -56,9 +54,5 @@ export function useComposerSubmit({ onSend, disabled }: UseComposerSubmitOptions
     attachments,
     addAttachment,
     removeAttachment,
-    webSearchEnabled,
-    toggleWebSearch: () => setWebSearchEnabled((v) => !v),
-    reasoningEnabled,
-    toggleReasoning: () => setReasoningEnabled((v) => !v),
   };
 }

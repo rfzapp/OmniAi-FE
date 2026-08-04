@@ -11,4 +11,6 @@ export const ROUTES = {
   settingsNotifications: "/settings/notifications",
   settingsPrivacy: "/settings/privacy",
   settingsSubscription: "/settings/subscription",
+  login: "/login",
+  signup: "/signup",
 } as const;

@@ -9,9 +9,7 @@ import { IconButton } from "@/components/atoms/IconButton";
 import { Button } from "@/components/atoms/Button";
 import { SearchInput } from "@/components/molecules/SearchInput";
 import { ChatHistoryItem } from "@/components/molecules/ChatHistoryItem";
-import { ProfileMenu } from "@/features/profile/components/ProfileMenu";
-import { NavItem } from "@/components/molecules/NavItem";
-import { Settings, Sparkles } from "lucide-react";
+import { SidebarSubscriptionPromo } from "./SidebarSubscriptionPromo";
 import { useChatHistory } from "@/features/sidebar/hooks/useChatHistory";
 import { useChat } from "@/features/chat/hooks/useChat";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -124,23 +122,7 @@ export function SidebarContent({
         )}
       </div>
 
-      <div className="flex flex-col gap-0.5 border-t border-sidebar-border px-3 py-3">
-        <NavItem
-          href={ROUTES.settings}
-          label="Settings"
-          icon={Settings}
-          collapsed={collapsed}
-          onClick={onNavigate}
-        />
-        <NavItem
-          href={ROUTES.settingsSubscription}
-          label="Subscription"
-          icon={Sparkles}
-          collapsed={collapsed}
-          onClick={onNavigate}
-        />
-        <ProfileMenu collapsed={collapsed} onNavigate={onNavigate} />
-      </div>
+      {!collapsed && <SidebarSubscriptionPromo />}
     </div>
   );
 }

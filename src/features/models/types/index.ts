@@ -1,3 +1,4 @@
+import type { StaticImageData } from "next/image";
 import type { SpeedTier } from "@/types";
 
 export interface AiModel {
@@ -6,5 +7,6 @@ export interface AiModel {
   name: string;
   description: string;
   speed: SpeedTier;
-  glyph: string;
+  logo: StaticImageData;
+  color: string;
 }

@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import { Sidebar } from "@/components/organisms/Sidebar";
 import { MobileSidebarSheet } from "@/components/organisms/MobileSidebarSheet";
-import { MobileTopBar } from "@/components/organisms/MobileTopBar";
+import { TopBar } from "@/components/organisms/TopBar";
+import { UpgradeModal } from "@/components/organisms/UpgradeModal";
 
 export function AppShell({ children }: { children: ReactNode }) {
   return (
@@ -9,9 +10,10 @@ export function AppShell({ children }: { children: ReactNode }) {
       <Sidebar />
       <MobileSidebarSheet />
       <div className="flex min-w-0 flex-1 flex-col">
-        <MobileTopBar />
+        <TopBar />
         <main className="flex min-h-0 flex-1 flex-col overflow-hidden">{children}</main>
       </div>
+      <UpgradeModal />
     </div>
   );
 }

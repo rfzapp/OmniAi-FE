@@ -1,3 +1,12 @@
+import chatgptLogo from "@/assets/logos/chatgpt.webp";
+import claudeLogo from "@/assets/logos/claude.png";
+import deepseekLogo from "@/assets/logos/deepseek.png";
+import geminiLogo from "@/assets/logos/gemini.png";
+import grokLogo from "@/assets/logos/grok.jpg";
+import kimiLogo from "@/assets/logos/kimi.jpg";
+import llamaLogo from "@/assets/logos/llama.png";
+import mistralLogo from "@/assets/logos/mistral.png";
+import qwenLogo from "@/assets/logos/qwen.webp";
 import type { AiModel } from "../types";
 
 export const AI_MODELS: AiModel[] = [
@@ -7,7 +16,8 @@ export const AI_MODELS: AiModel[] = [
     name: "GPT",
     description: "Versatile all-rounder, strong at reasoning and coding",
     speed: "standard",
-    glyph: "G",
+    logo: chatgptLogo,
+    color: "#10A37F",
   },
   {
     id: "claude-omni",
@@ -15,7 +25,8 @@ export const AI_MODELS: AiModel[] = [
     name: "Claude",
     description: "Thoughtful, careful writing and long-context analysis",
     speed: "standard",
-    glyph: "C",
+    logo: claudeLogo,
+    color: "#D97757",
   },
   {
     id: "gemini-omni",
@@ -23,7 +34,8 @@ export const AI_MODELS: AiModel[] = [
     name: "Gemini",
     description: "Multimodal reasoning with fast turnaround",
     speed: "fast",
-    glyph: "G",
+    logo: geminiLogo,
+    color: "#4285F4",
   },
   {
     id: "deepseek-omni",
@@ -31,7 +43,8 @@ export const AI_MODELS: AiModel[] = [
     name: "DeepSeek",
     description: "Efficient reasoning model, great for math and code",
     speed: "fast",
-    glyph: "D",
+    logo: deepseekLogo,
+    color: "#4D6BFE",
   },
   {
     id: "kimi-omni",
@@ -39,7 +52,8 @@ export const AI_MODELS: AiModel[] = [
     name: "Kimi",
     description: "Long-context specialist for large documents",
     speed: "standard",
-    glyph: "K",
+    logo: kimiLogo,
+    color: "#0F9D8B",
   },
   {
     id: "grok-omni",
@@ -47,7 +61,8 @@ export const AI_MODELS: AiModel[] = [
     name: "Grok",
     description: "Real-time knowledge with a conversational edge",
     speed: "fast",
-    glyph: "X",
+    logo: grokLogo,
+    color: "#111827",
   },
   {
     id: "llama-omni",
@@ -55,7 +70,8 @@ export const AI_MODELS: AiModel[] = [
     name: "Llama",
     description: "Open-weight model tuned for flexibility",
     speed: "fast",
-    glyph: "L",
+    logo: llamaLogo,
+    color: "#0668E1",
   },
   {
     id: "mistral-omni",
@@ -63,7 +79,8 @@ export const AI_MODELS: AiModel[] = [
     name: "Mistral",
     description: "Lightweight and fast for everyday tasks",
     speed: "fast",
-    glyph: "M",
+    logo: mistralLogo,
+    color: "#FA5B0F",
   },
   {
     id: "qwen-omni",
@@ -71,6 +88,7 @@ export const AI_MODELS: AiModel[] = [
     name: "Qwen",
     description: "Strong multilingual and coding performance",
     speed: "slower",
-    glyph: "Q",
+    logo: qwenLogo,
+    color: "#6C5CE7",
   },
 ];

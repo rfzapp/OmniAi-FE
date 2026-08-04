@@ -10,7 +10,7 @@ export function Sidebar() {
 
   return (
     <motion.aside
-      animate={{ width: collapsed ? 68 : 272 }}
+      animate={{ width: collapsed ? 60 : 212 }}
       transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
       className="hidden shrink-0 border-r border-sidebar-border md:block"
     >

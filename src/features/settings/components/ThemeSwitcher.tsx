@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { useTheme } from "next-themes";
 import { Monitor, Moon, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -11,11 +11,17 @@ const OPTIONS = [
   { value: "system", label: "System", icon: Monitor },
 ] as const;
 
+function noopSubscribe() {
+  return () => {};
+}
+
 export function ThemeSwitcher() {
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
+  const mounted = useSyncExternalStore(
+    noopSubscribe,
+    () => true,
+    () => false
+  );
 
   return (
     <div className="inline-flex rounded-lg border border-border bg-muted/40 p-1">
