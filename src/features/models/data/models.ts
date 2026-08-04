@@ -1,0 +1,94 @@
+import chatgptLogo from "@/assets/logos/chatgpt.webp";
+import claudeLogo from "@/assets/logos/claude.png";
+import deepseekLogo from "@/assets/logos/deepseek.png";
+import geminiLogo from "@/assets/logos/gemini.png";
+import grokLogo from "@/assets/logos/grok.jpg";
+import kimiLogo from "@/assets/logos/kimi.jpg";
+import llamaLogo from "@/assets/logos/llama.png";
+import mistralLogo from "@/assets/logos/mistral.png";
+import qwenLogo from "@/assets/logos/qwen.webp";
+import type { AiModel } from "../types";
+
+export const AI_MODELS: AiModel[] = [
+  {
+    id: "gpt-omni",
+    provider: "OpenAI",
+    name: "GPT",
+    description: "Versatile all-rounder, strong at reasoning and coding",
+    speed: "standard",
+    logo: chatgptLogo,
+    color: "#10A37F",
+  },
+  {
+    id: "claude-omni",
+    provider: "Anthropic",
+    name: "Claude",
+    description: "Thoughtful, careful writing and long-context analysis",
+    speed: "standard",
+    logo: claudeLogo,
+    color: "#D97757",
+  },
+  {
+    id: "gemini-omni",
+    provider: "Google",
+    name: "Gemini",
+    description: "Multimodal reasoning with fast turnaround",
+    speed: "fast",
+    logo: geminiLogo,
+    color: "#4285F4",
+  },
+  {
+    id: "deepseek-omni",
+    provider: "DeepSeek",
+    name: "DeepSeek",
+    description: "Efficient reasoning model, great for math and code",
+    speed: "fast",
+    logo: deepseekLogo,
+    color: "#4D6BFE",
+  },
+  {
+    id: "kimi-omni",
+    provider: "Moonshot AI",
+    name: "Kimi",
+    description: "Long-context specialist for large documents",
+    speed: "standard",
+    logo: kimiLogo,
+    color: "#0F9D8B",
+  },
+  {
+    id: "grok-omni",
+    provider: "xAI",
+    name: "Grok",
+    description: "Real-time knowledge with a conversational edge",
+    speed: "fast",
+    logo: grokLogo,
+    color: "#111827",
+  },
+  {
+    id: "llama-omni",
+    provider: "Meta",
+    name: "Llama",
+    description: "Open-weight model tuned for flexibility",
+    speed: "fast",
+    logo: llamaLogo,
+    color: "#0668E1",
+  },
+  {
+    id: "mistral-omni",
+    provider: "Mistral AI",
+    name: "Mistral",
+    description: "Lightweight and fast for everyday tasks",
+    speed: "fast",
+    logo: mistralLogo,
+    color: "#FA5B0F",
+  },
+  {
+    id: "qwen-omni",
+    provider: "Alibaba",
+    name: "Qwen",
+    description: "Strong multilingual and coding performance",
+    speed: "slower",
+    logo: qwenLogo,
+    color: "#6C5CE7",
+  },
+];

@@ -1,0 +1,16 @@
+export const ROUTES = {
+  home: "/",
+  chat: (chatId: string) => `/c/${chatId}`,
+  settings: "/settings",
+  settingsProfile: "/settings/profile",
+  settingsAppearance: "/settings/appearance",
+  settingsModels: "/settings/models",
+  settingsApiKeys: "/settings/api-keys",
+  settingsHistory: "/settings/history",
+  settingsMemory: "/settings/memory",
+  settingsNotifications: "/settings/notifications",
+  settingsPrivacy: "/settings/privacy",
+  settingsSubscription: "/settings/subscription",
+  login: "/login",
+  signup: "/signup",
+} as const;
