@@ -1,15 +1,39 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useChatStore } from "@/store/useChatStore";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useUsageStore } from "@/store/useUsageStore";
 import { chatService } from "../services/chatService";
-import type { Message } from "../types";
 import { useStreamingMessage } from "./useStreamingMessage";
+import { DEFAULT_MODEL_ID, getModelName, isModelAvailable, resolveApiModel } from "@/config/models.config";
+import { ApiError, getApiErrorMessage } from "@/services/httpClient";
+
+function isNotFoundError(err: unknown): boolean {
+  return err instanceof ApiError && err.status === 404;
+}
+
+export function isLimitReachedError(err: unknown): boolean {
+  return err instanceof ApiError && err.status === 403;
+}
+
+export class ModelUnavailableError extends Error {}
+
+export function isModelUnavailableError(err: unknown): err is ModelUnavailableError {
+  return err instanceof ModelUnavailableError;
+}
 
 function createId(): string {
   return typeof crypto !== "undefined" && "randomUUID" in crypto
     ? crypto.randomUUID()
     : `id-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+// Backend conversation ids are Mongo ObjectIds. Guards against stale/bad
+// ids (e.g. a browser tab left on /c/undefined) instead of forwarding them
+// to the API and erroring out.
+function isValidChatId(id?: string): id is string {
+  return !!id && /^[0-9a-fA-F]{24}$/.test(id);
 }
 
 export function useChat(chatId?: string) {
@@ -23,14 +47,22 @@ export function useChat(chatId?: string) {
   const setMessages = useChatStore((s) => s.setMessages);
   const addMessage = useChatStore((s) => s.addMessage);
   const updateMessage = useChatStore((s) => s.updateMessage);
+  const removeMessage = useChatStore((s) => s.removeMessage);
   const setStreamingMessageId = useChatStore((s) => s.setStreamingMessageId);
   const streaming = useStreamingMessage();
+  const [chatNotFound, setChatNotFound] = useState(false);
 
   const messages = (chatId && messagesByChat[chatId]) || [];
 
   const loadChats = useCallback(async () => {
-    const list = await chatService.listChats();
-    setChats(list);
+    try {
+      const list = await chatService.listChats();
+      setChats(list);
+    } catch (err) {
+      // Not logged in yet (or session expired) — leave the list empty
+      // instead of crashing; a later successful login will retry this.
+      console.error("Failed to load chats:", err);
+    }
   }, [setChats]);
 
   useEffect(() => {
@@ -38,8 +70,22 @@ export function useChat(chatId?: string) {
   }, [chatsLoaded, loadChats]);
 
   useEffect(() => {
-    if (!chatId || messagesByChat[chatId]) return;
-    void chatService.listMessages(chatId).then((list) => setMessages(chatId, list));
+    setChatNotFound(false);
+    if (!isValidChatId(chatId)) {
+      if (chatId) setChatNotFound(true); // well-formed-looking but invalid id
+      return;
+    }
+    if (messagesByChat[chatId]) return;
+    chatService
+      .listMessages(chatId)
+      .then((list) => setMessages(chatId, list))
+      .catch((err) => {
+        console.error("Failed to load messages:", err);
+        if (isNotFoundError(err)) {
+          removeChat(chatId);
+          setChatNotFound(true);
+        }
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatId]);
 
@@ -61,53 +107,111 @@ export function useChat(chatId?: string) {
   );
 
   const sendMessage = useCallback(
-    async (content: string, modelId: string, targetChatId?: string): Promise<string> => {
-      let activeChatId = targetChatId;
+    async (content: string, modelId: string, rawTargetChatId?: string): Promise<string> => {
+      const targetChatId = isValidChatId(rawTargetChatId) ? rawTargetChatId : undefined;
+      const assistantMessageId = createId();
+      const apiModel = resolveApiModel(modelId);
 
-      if (!activeChatId) {
-        const title = content.length > 48 ? `${content.slice(0, 48)}…` : content;
-        const chat = await chatService.createChat(title);
-        upsertChat(chat);
-        activeChatId = chat.id;
+      if (!targetChatId && !isModelAvailable(modelId)) {
+        // Brand-new chat: nothing rendered yet for this conversation, so
+        // there's nowhere to show a notice bubble — the caller (which
+        // ideally already pre-checked this) needs to handle it instead.
+        throw new ModelUnavailableError(`${getModelName(modelId)} isn't available yet — coming soon! Try GPT for now.`);
       }
 
-      const userMessage: Message = {
-        id: createId(),
-        chatId: activeChatId,
-        role: "user",
-        content,
-        createdAt: new Date().toISOString(),
-      };
-      addMessage(userMessage);
-      void chatService.sendMessage(userMessage);
+      // Existing chat: we already have a stable id, so show the user's
+      // message and a "thinking" placeholder immediately.
+      if (targetChatId) {
+        addMessage({ id: createId(), chatId: targetChatId, role: "user", content, createdAt: new Date().toISOString() });
 
-      const assistantMessageId = createId();
-      const assistantMessage: Message = {
-        id: assistantMessageId,
-        chatId: activeChatId,
-        role: "assistant",
-        content: "",
-        createdAt: new Date().toISOString(),
-        modelId,
-      };
-      addMessage(assistantMessage);
-      setStreamingMessageId(assistantMessageId);
+        if (!isModelAvailable(modelId)) {
+          // Only OpenAI is actually wired up on the backend — don't spend a
+          // network call (or a free prompt) pretending other models work.
+          addMessage({
+            id: assistantMessageId,
+            chatId: targetChatId,
+            role: "assistant",
+            content: `${getModelName(modelId)} isn't available yet — coming soon! Try GPT for now.`,
+            createdAt: new Date().toISOString(),
+            modelId,
+          });
+          return targetChatId;
+        }
 
-      const fullReply = await chatService.requestAssistantReply(content);
+        addMessage({
+          id: assistantMessageId,
+          chatId: targetChatId,
+          role: "assistant",
+          content: "",
+          createdAt: new Date().toISOString(),
+          modelId,
+        });
+        setStreamingMessageId(assistantMessageId);
+      }
+
+      let result;
+      try {
+        result = await chatService.sendChatMessage({
+          model: apiModel,
+          message: content,
+          conversationId: targetChatId,
+        });
+        useAuthStore.getState().setPromptCount(result.usage.promptsUsed);
+      } catch (err) {
+        setStreamingMessageId(null);
+        if (targetChatId) {
+          if (isNotFoundError(err)) {
+            // This conversation doesn't exist for us anymore (stale URL,
+            // deleted, wrong account) — bail out to the parent page rather
+            // than leaving the user stuck retrying against a dead chat.
+            removeChat(targetChatId);
+            setChatNotFound(true);
+            return targetChatId;
+          }
+          if (isLimitReachedError(err)) {
+            removeMessage(targetChatId, assistantMessageId);
+            useUsageStore.getState().openUpgradeModal();
+            return targetChatId;
+          }
+          // Already have a message bubble to show the error in — surface it
+          // there and stop, rather than also rejecting (which would crash
+          // into an unhandled-error overlay on top of the visible message).
+          updateMessage(targetChatId, assistantMessageId, { content: getApiErrorMessage(err) });
+          return targetChatId;
+        }
+        // New chat: nothing rendered yet, so the caller needs to know it failed.
+        throw err;
+      }
+
+      const activeChatId = result.conversation.id;
+
+      // New chat: we only know the real id now, so add both messages at once.
+      if (!targetChatId) {
+        upsertChat(result.conversation);
+        addMessage({ id: createId(), chatId: activeChatId, role: "user", content, createdAt: new Date().toISOString() });
+        addMessage({
+          id: assistantMessageId,
+          chatId: activeChatId,
+          role: "assistant",
+          content: "",
+          createdAt: new Date().toISOString(),
+          modelId,
+        });
+        setStreamingMessageId(assistantMessageId);
+      }
+
       streaming.start(
-        fullReply,
-        (partial) => updateMessage(activeChatId!, assistantMessageId, { content: partial }),
+        result.message.content,
+        (partial) => updateMessage(activeChatId, assistantMessageId, { content: partial }),
         () => {
           setStreamingMessageId(null);
-          void chatService.touchChat(activeChatId!).then(loadChats);
-          const finalMessage: Message = { ...assistantMessage, content: fullReply };
-          void chatService.sendMessage(finalMessage);
+          void loadChats();
         }
       );
 
       return activeChatId;
     },
-    [addMessage, updateMessage, setStreamingMessageId, streaming, upsertChat, loadChats]
+    [addMessage, updateMessage, removeMessage, setStreamingMessageId, streaming, upsertChat, loadChats, removeChat]
   );
 
   const regenerateMessage = useCallback(
@@ -116,20 +220,52 @@ export function useChat(chatId?: string) {
       const index = list.findIndex((m) => m.id === messageId);
       const lastUserMessage = [...list.slice(0, index)].reverse().find((m) => m.role === "user");
       if (!lastUserMessage) return;
+      const previousContent = list[index]?.content ?? "";
+      const modelId = list[index]?.modelId ?? DEFAULT_MODEL_ID;
+
+      if (!isModelAvailable(modelId)) {
+        updateMessage(targetChatId, messageId, {
+          content: `${getModelName(modelId)} isn't available yet — coming soon! Try GPT for now.`,
+        });
+        return;
+      }
 
       updateMessage(targetChatId, messageId, { content: "" });
       setStreamingMessageId(messageId);
-      const fullReply = await chatService.requestAssistantReply(lastUserMessage.content);
-      streaming.start(
-        fullReply,
-        (partial) => updateMessage(targetChatId, messageId, { content: partial }),
-        () => {
-          setStreamingMessageId(null);
-          void chatService.touchChat(targetChatId).then(loadChats);
+      try {
+        const result = await chatService.sendChatMessage({
+          model: resolveApiModel(modelId),
+          message: lastUserMessage.content,
+          conversationId: targetChatId,
+        });
+        useAuthStore.getState().setPromptCount(result.usage.promptsUsed);
+        streaming.start(
+          result.message.content,
+          (partial) => updateMessage(targetChatId, messageId, { content: partial }),
+          () => {
+            setStreamingMessageId(null);
+            void loadChats();
+          }
+        );
+      } catch (err) {
+        setStreamingMessageId(null);
+        if (isNotFoundError(err)) {
+          removeChat(targetChatId);
+          setChatNotFound(true);
+          return;
         }
-      );
+        // Don't lose the original reply on failure — restore it rather
+        // than leaving the bubble blank or overwritten permanently.
+        if (isLimitReachedError(err)) {
+          useUsageStore.getState().openUpgradeModal();
+          updateMessage(targetChatId, messageId, { content: previousContent });
+          return;
+        }
+        console.error("Failed to regenerate message:", err);
+        updateMessage(targetChatId, messageId, { content: previousContent });
+      }
     },
-    [messagesByChat, updateMessage, setStreamingMessageId, streaming, loadChats]
+    [messagesByChat, updateMessage, setStreamingMessageId, streaming, loadChats, removeChat]
   );
 
   const toggleReaction = useCallback(
@@ -150,6 +286,7 @@ export function useChat(chatId?: string) {
     messages,
     isStreaming: Boolean(streamingMessageId),
     streamingMessageId,
+    chatNotFound,
     sendMessage,
     deleteChat,
     renameChat,

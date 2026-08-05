@@ -5,23 +5,38 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/atoms/Input";
 import { Button } from "@/components/atoms/Button";
 import { Label } from "@/components/ui/label";
-import { useAuthStore } from "@/store/useAuthStore";
+import { authService } from "../services/authService";
+import { getApiErrorMessage } from "@/services/httpClient";
 
 export function SignupForm({ redirectTo }: { redirectTo: string }) {
   const router = useRouter();
-  const login = useAuthStore((s) => s.login);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    login(email, name);
-    router.push(redirectTo);
+    setError(null);
+    setIsSubmitting(true);
+    try {
+      await authService.register(name, email, password);
+      router.push(redirectTo);
+    } catch (err) {
+      setError(getApiErrorMessage(err));
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      {error && (
+        <p role="alert" className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          {error}
+        </p>
+      )}
       <div className="grid gap-1.5">
         <Label htmlFor="signup-name">Name</Label>
         <Input
@@ -54,8 +69,8 @@ export function SignupForm({ redirectTo }: { redirectTo: string }) {
           placeholder="••••••••"
         />
       </div>
-      <Button type="submit" className="w-full">
-        Create account
+      <Button type="submit" className="w-full" disabled={isSubmitting}>
+        {isSubmitting ? "Creating account…" : "Create account"}
       </Button>
     </form>
   );

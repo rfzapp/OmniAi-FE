@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { LogOut, Settings } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/atoms/Avatar";
-import { useAuthStore } from "@/store/useAuthStore";
+import { getUserInitials, useAuthStore } from "@/store/useAuthStore";
+import { authService } from "@/features/auth/services/authService";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import { ROUTES } from "@/constants/routes";
 import { cn } from "@/lib/utils";
@@ -19,16 +20,15 @@ interface ProfileMenuProps {
 export function ProfileMenu({ collapsed, onNavigate }: ProfileMenuProps) {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
-  const logout = useAuthStore((s) => s.logout);
 
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   useClickOutside(containerRef, () => setOpen(false));
 
-  function handleLogout() {
+  async function handleLogout() {
     setOpen(false);
-    logout();
     onNavigate?.();
+    await authService.logout();
     router.push(ROUTES.home);
   }
 
@@ -46,13 +46,13 @@ export function ProfileMenu({ collapsed, onNavigate }: ProfileMenuProps) {
       >
         <Avatar size="sm">
           <AvatarFallback className="bg-brand-100 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300">
-            {user?.avatarInitials ?? "?"}
+            {getUserInitials(user)}
           </AvatarFallback>
         </Avatar>
         {!collapsed && (
           <span className="min-w-0 flex-1 truncate text-left">
             <span className="block truncate font-medium text-sidebar-foreground">
-              {user?.name ?? "Account"}
+              {user?.fullName ?? "Account"}
             </span>
             <span className="block truncate text-xs text-sidebar-foreground/50">
               {user?.email ?? ""}

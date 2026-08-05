@@ -9,4 +9,6 @@ export interface AiModel {
   speed: SpeedTier;
   logo: StaticImageData;
   color: string;
+  /** Whether the backend actually has a provider wired up for this model yet. */
+  available: boolean;
 }

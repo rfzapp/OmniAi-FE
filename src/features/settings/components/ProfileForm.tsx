@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback } from "@/components/atoms/Avatar";
 import { Button } from "@/components/atoms/Button";
 import { Input } from "@/components/atoms/Input";
 import { Label } from "@/components/ui/label";
-import { useAuthStore, type AuthUser } from "@/store/useAuthStore";
+import { getUserInitials, useAuthStore, type AuthUser } from "@/store/useAuthStore";
 import { ROUTES } from "@/constants/routes";
 
 export function ProfileForm() {
@@ -17,7 +17,7 @@ export function ProfileForm() {
       <div className="flex items-center gap-3">
         <Avatar size="lg">
           <AvatarFallback className="bg-brand-100 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300">
-            {user?.avatarInitials ?? "?"}
+            {getUserInitials(user)}
           </AvatarFallback>
         </Avatar>
         <Button variant="outline" size="sm" type="button" disabled={!user}>
@@ -40,7 +40,7 @@ export function ProfileForm() {
 }
 
 function ProfileFields({ user }: { user: AuthUser }) {
-  const [name, setName] = useState(user.name);
+  const [name, setName] = useState(user.fullName);
   const [saved, setSaved] = useState(false);
 
   function handleSave() {

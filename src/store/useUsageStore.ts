@@ -1,28 +1,33 @@
 import { create } from "zustand";
+import { useAuthStore } from "@/store/useAuthStore";
 import { FREE_PROMPT_LIMIT } from "@/config/usage.config";
 
 interface UsageState {
-  promptsUsed: number;
   upgradeModalOpen: boolean;
-  incrementUsage: () => void;
   openUpgradeModal: () => void;
   closeUpgradeModal: () => void;
 }
 
-/**
- * In-memory only (no persistence) — there's no backend/account yet to tie
- * usage to, so a page refresh intentionally resets the free-prompt count.
- * Once auth + a real API exist, swap this for a server-tracked value.
- */
 export const useUsageStore = create<UsageState>((set) => ({
-  promptsUsed: 0,
   upgradeModalOpen: false,
-  incrementUsage: () => set((s) => ({ promptsUsed: s.promptsUsed + 1 })),
   openUpgradeModal: () => set({ upgradeModalOpen: true }),
   closeUpgradeModal: () => set({ upgradeModalOpen: false }),
 }));
 
+/**
+ * The backend enforces the prompt limit and is the source of truth; this
+ * only mirrors the authenticated user's real count for display. Before
+ * login resolves, assume the full free allowance so the composer isn't
+ * blocked prematurely — the backend will reject anyway if that's wrong.
+ */
 export function useRemainingFreePrompts(): number {
-  const promptsUsed = useUsageStore((s) => s.promptsUsed);
-  return Math.max(0, FREE_PROMPT_LIMIT - promptsUsed);
+  const user = useAuthStore((s) => s.user);
+  if (!user) return FREE_PROMPT_LIMIT;
+  if (user.subscription !== "free") return Number.POSITIVE_INFINITY;
+  return Math.max(0, FREE_PROMPT_LIMIT - user.promptCount);
+}
+
+export function useIsUnlimitedPlan(): boolean {
+  const user = useAuthStore((s) => s.user);
+  return !!user && user.subscription !== "free";
 }

@@ -17,14 +17,19 @@ interface ChatState {
   updateMessage: (chatId: string, messageId: string, patch: Partial<Message>) => void;
   removeMessage: (chatId: string, messageId: string) => void;
   setStreamingMessageId: (id: string | null) => void;
+  reset: () => void;
 }
 
-export const useChatStore = create<ChatState>((set) => ({
-  chats: [],
+const initialState = {
+  chats: [] as Chat[],
   chatsLoaded: false,
-  messagesByChat: {},
-  activeChatId: null,
-  streamingMessageId: null,
+  messagesByChat: {} as Record<string, Message[]>,
+  activeChatId: null as string | null,
+  streamingMessageId: null as string | null,
+};
+
+export const useChatStore = create<ChatState>((set) => ({
+  ...initialState,
 
   setChats: (chats) => set({ chats, chatsLoaded: true }),
 
@@ -84,4 +89,9 @@ export const useChatStore = create<ChatState>((set) => ({
     }),
 
   setStreamingMessageId: (id) => set({ streamingMessageId: id }),
+
+  // Wipes any trace of the previous account's chats/messages — called on
+  // logout (explicit or a silently-expired session) so the next login
+  // starts clean and actually refetches, instead of showing stale data.
+  reset: () => set({ ...initialState }),
 }));

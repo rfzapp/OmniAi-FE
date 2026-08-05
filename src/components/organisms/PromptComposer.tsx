@@ -36,18 +36,7 @@ export function PromptComposer({
     >
       <AttachmentPreview attachments={attachments} onRemove={removeAttachment} />
 
-      <Textarea
-        ref={textareaRef}
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        onKeyDown={handleKeyDown}
-        placeholder={placeholder}
-        rows={1}
-        disabled={disabled}
-        className="min-h-12 resize-none border-0 bg-transparent px-4 pt-3.5 pb-1 text-sm shadow-none focus-visible:ring-0 md:text-base"
-      />
-
-      <div className="flex items-center justify-between gap-2 px-2.5 pb-2.5">
+      <div className="flex items-end gap-1 px-2 py-1.5">
         <input
           ref={fileInputRef}
           type="file"
@@ -62,16 +51,28 @@ export function PromptComposer({
           label="Attach file"
           onClick={() => fileInputRef.current?.click()}
           disabled={disabled}
+          className="mb-0.5 shrink-0"
         >
           <Paperclip className="size-4" />
         </IconButton>
+
+        <Textarea
+          ref={textareaRef}
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder={placeholder}
+          rows={1}
+          disabled={disabled}
+          className="min-h-9 flex-1 resize-none border-0 bg-transparent px-1.5 py-1.5 text-sm shadow-none focus-visible:ring-0 md:text-base"
+        />
 
         <button
           type="button"
           onClick={submit}
           disabled={disabled || !value.trim()}
           aria-label="Send message"
-          className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform enabled:hover:scale-105 disabled:opacity-40"
+          className="mb-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform enabled:hover:scale-105 disabled:opacity-40"
         >
           <ArrowUp className="size-4" />
         </button>

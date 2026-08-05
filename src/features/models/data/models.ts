@@ -18,6 +18,7 @@ export const AI_MODELS: AiModel[] = [
     speed: "standard",
     logo: chatgptLogo,
     color: "#10A37F",
+    available: true,
   },
   {
     id: "claude-omni",
@@ -27,6 +28,7 @@ export const AI_MODELS: AiModel[] = [
     speed: "standard",
     logo: claudeLogo,
     color: "#D97757",
+    available: false,
   },
   {
     id: "gemini-omni",
@@ -36,6 +38,7 @@ export const AI_MODELS: AiModel[] = [
     speed: "fast",
     logo: geminiLogo,
     color: "#4285F4",
+    available: false,
   },
   {
     id: "deepseek-omni",
@@ -45,6 +48,7 @@ export const AI_MODELS: AiModel[] = [
     speed: "fast",
     logo: deepseekLogo,
     color: "#4D6BFE",
+    available: false,
   },
   {
     id: "kimi-omni",
@@ -54,6 +58,7 @@ export const AI_MODELS: AiModel[] = [
     speed: "standard",
     logo: kimiLogo,
     color: "#0F9D8B",
+    available: false,
   },
   {
     id: "grok-omni",
@@ -63,6 +68,7 @@ export const AI_MODELS: AiModel[] = [
     speed: "fast",
     logo: grokLogo,
     color: "#111827",
+    available: false,
   },
   {
     id: "llama-omni",
@@ -72,6 +78,7 @@ export const AI_MODELS: AiModel[] = [
     speed: "fast",
     logo: llamaLogo,
     color: "#0668E1",
+    available: false,
   },
   {
     id: "mistral-omni",
@@ -81,6 +88,7 @@ export const AI_MODELS: AiModel[] = [
     speed: "fast",
     logo: mistralLogo,
     color: "#FA5B0F",
+    available: false,
   },
   {
     id: "qwen-omni",
@@ -90,5 +98,6 @@ export const AI_MODELS: AiModel[] = [
     speed: "slower",
     logo: qwenLogo,
     color: "#6C5CE7",
+    available: false,
   },
 ];
