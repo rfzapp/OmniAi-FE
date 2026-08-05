@@ -3,16 +3,20 @@
 import { motion } from "framer-motion";
 import { Zap } from "lucide-react";
 import { ComposerBar } from "./ComposerBar";
-import { useRemainingFreePrompts } from "@/store/useUsageStore";
+import { useRemainingFreePrompts, useIsUnlimitedPlan } from "@/store/useUsageStore";
 import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils";
 
 interface ChatEmptyStateProps {
   onSend: (content: string) => void | Promise<void>;
+  disabled?: boolean;
+  statusMessage?: string;
+  statusIsError?: boolean;
 }
 
-export function ChatEmptyState({ onSend }: ChatEmptyStateProps) {
+export function ChatEmptyState({ onSend, disabled, statusMessage, statusIsError }: ChatEmptyStateProps) {
   const remaining = useRemainingFreePrompts();
+  const isUnlimited = useIsUnlimitedPlan();
   const limitReached = remaining <= 0;
 
   return (
@@ -32,23 +36,36 @@ export function ChatEmptyState({ onSend }: ChatEmptyStateProps) {
         transition={{ duration: 0.4, delay: 0.1 }}
         className="flex w-full flex-col items-center gap-3"
       >
-        <span
-          className={cn(
-            "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium",
-            remaining === 0 &&
-              "border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-400",
-            remaining === 1 &&
-              "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-400",
-            remaining >= 2 && "border-brand-200 bg-brand-50 text-brand-700"
-          )}
-        >
-          <Zap className="size-3.5" />
-          {limitReached
-            ? "You've used all your free prompts"
-            : `You have ${remaining} free prompt${remaining === 1 ? "" : "s"} remaining`}
-        </span>
+        {(statusMessage || !isUnlimited) && (
+          <span
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium",
+              statusIsError &&
+                "border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-400",
+              !statusIsError &&
+                !isUnlimited &&
+                remaining === 0 &&
+                "border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-400",
+              !statusIsError &&
+                !isUnlimited &&
+                remaining === 1 &&
+                "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-400",
+              !statusIsError &&
+                (isUnlimited || remaining >= 2) &&
+                "border-brand-200 bg-brand-50 text-brand-700"
+            )}
+          >
+            <Zap className="size-3.5" />
+            {statusMessage ??
+              (limitReached
+                ? "You've used all your free prompts"
+                : `You have ${remaining} free prompt${remaining === 1 ? "" : "s"} remaining`)}
+          </span>
+        )}
 
-        <ComposerBar onSend={onSend} disabled={limitReached} />
+        {/* Not disabling on limitReached: the click needs to reach onSend
+            so its own limit check can open the upgrade modal. */}
+        <ComposerBar onSend={onSend} disabled={disabled} />
       </motion.div>
     </div>
   );

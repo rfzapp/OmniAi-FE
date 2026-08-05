@@ -3,17 +3,18 @@
 import { useState } from "react";
 import { Sparkles, X } from "lucide-react";
 import { useGoToSubscription } from "@/features/settings/hooks/useGoToSubscription";
+import { useIsUnlimitedPlan } from "@/store/useUsageStore";
 
 /**
- * Dismissal is local component state only (no persistence) — there's no
- * backend/account yet to remember the choice, so it intentionally
- * reappears on refresh, same as the free-prompt usage count.
+ * Dismissal is local component state only (no persistence) — reappears on
+ * refresh. Hidden entirely once the account is actually on a paid plan.
  */
 export function SidebarSubscriptionPromo() {
   const goToSubscription = useGoToSubscription();
   const [dismissed, setDismissed] = useState(false);
+  const isUnlimited = useIsUnlimitedPlan();
 
-  if (dismissed) return null;
+  if (dismissed || isUnlimited) return null;
 
   return (
     <div className="relative mx-1 mb-2 rounded-xl border border-brand-200 bg-brand-50 p-3 dark:border-brand-900 dark:bg-brand-950/30">

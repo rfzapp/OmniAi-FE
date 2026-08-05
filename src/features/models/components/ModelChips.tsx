@@ -35,7 +35,12 @@ export function ModelChips({ className }: { className?: string }) {
                 : "border-border hover:border-brand-300"
             )}
           >
-            <span className="flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white ring-1 ring-black/5">
+            <span
+              className={cn(
+                "flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white ring-1 ring-black/5",
+                !model.available && "grayscale"
+              )}
+            >
               <Image
                 src={model.logo}
                 alt={`${model.name} logo`}
@@ -44,7 +49,14 @@ export function ModelChips({ className }: { className?: string }) {
                 className="size-5 object-contain"
               />
             </span>
-            <span className="text-foreground">{model.name}</span>
+            <span className={cn("text-foreground", !model.available && "text-muted-foreground")}>
+              {model.name}
+            </span>
+            {!model.available && (
+              <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+                Soon
+              </span>
+            )}
           </motion.button>
         );
       })}
