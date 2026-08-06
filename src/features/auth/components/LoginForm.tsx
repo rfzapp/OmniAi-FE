@@ -7,11 +7,13 @@ import { Input } from "@/components/atoms/Input";
 import { Button } from "@/components/atoms/Button";
 import { Label } from "@/components/ui/label";
 import { authService } from "../services/authService";
+import { usePreferencesSync } from "@/features/settings/hooks/usePreferencesSync";
 import { getApiErrorMessage } from "@/services/httpClient";
 import { ROUTES } from "@/constants/routes";
 
 export function LoginForm({ redirectTo }: { redirectTo: string }) {
   const router = useRouter();
+  const syncPreferences = usePreferencesSync();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -23,6 +25,7 @@ export function LoginForm({ redirectTo }: { redirectTo: string }) {
     setIsSubmitting(true);
     try {
       await authService.login(email, password);
+      await syncPreferences().catch(() => {});
       router.push(redirectTo);
     } catch (err) {
       setError(getApiErrorMessage(err));

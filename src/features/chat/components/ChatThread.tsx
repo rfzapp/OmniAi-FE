@@ -15,7 +15,7 @@ export function ChatThread({ chatId }: { chatId: string }) {
   const router = useRouter();
   const { messages, streamingMessageId, isStreaming, chatNotFound, sendMessage, toggleReaction, regenerateMessage } =
     useChat(chatId);
-  const selectedModelId = useModelStore((s) => s.selectedModelId);
+  const getEffectiveModelId = useModelStore((s) => s.getEffectiveModelId);
   const remaining = useRemainingFreePrompts();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const openUpgradeModal = useUsageStore((s) => s.openUpgradeModal);
@@ -57,7 +57,7 @@ export function ChatThread({ chatId }: { chatId: string }) {
               openUpgradeModal();
               return;
             }
-            await sendMessage(content, selectedModelId, chatId);
+            await sendMessage(content, getEffectiveModelId(), chatId);
           }}
         />
       }

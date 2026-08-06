@@ -28,7 +28,7 @@ const components: Components = {
     <h3 className="mt-3 mb-1.5 text-base font-semibold first:mt-0">{children}</h3>
   ),
   blockquote: ({ children }) => (
-    <blockquote className="mb-3 border-l-2 border-brand-300 pl-3 text-muted-foreground italic last:mb-0">
+    <blockquote className="mb-3 border-l-2 border-[#E5E7EB] pl-3 text-[#6B7280] italic last:mb-0">
       {children}
     </blockquote>
   ),

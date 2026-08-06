@@ -29,7 +29,7 @@ export function SettingsNav() {
         })}
       </nav>
 
-      <nav className="no-scrollbar sticky top-0 z-10 flex gap-1 overflow-x-auto border-b border-border bg-background px-1 pb-2 md:hidden">
+      <nav className="no-scrollbar sticky top-0 z-10 -mx-4 flex gap-1 overflow-x-auto border-b border-border bg-background px-4 pb-2 md:hidden">
         {SETTINGS_NAV.map((item) => {
           const active = pathname === item.href;
           return (
@@ -37,14 +37,14 @@ export function SettingsNav() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex shrink-0 items-center gap-1.5 rounded-full border border-transparent px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors",
+                "flex shrink-0 items-center gap-1 rounded-full border border-transparent px-2.5 py-1.5 text-xs font-medium whitespace-nowrap text-muted-foreground transition-colors",
                 active
                   ? "border-brand-200 bg-brand-100 text-brand-700 dark:border-brand-800 dark:bg-brand-900/40 dark:text-brand-300"
                   : "hover:bg-muted"
               )}
             >
-              <item.icon className="size-3.5" />
-              {item.label}
+              <item.icon className="size-3.5 shrink-0" />
+              {item.shortLabel ?? item.label}
             </Link>
           );
         })}

@@ -46,7 +46,7 @@ export function MessageActionsBar({
         </IconButton>
       )}
       <ModelBadge modelId={message.modelId} />
-      <span className="ml-1 text-xs text-muted-foreground/70">
+      <span className="ml-1 text-xs text-[#6B7280]">
         {formatTimestamp(new Date(message.createdAt))}
       </span>
     </div>
