@@ -14,7 +14,7 @@ import { getApiErrorMessage } from "@/services/httpClient";
 export function NewChatHome() {
   const router = useRouter();
   const { sendMessage } = useChat();
-  const selectedModelId = useModelStore((s) => s.selectedModelId);
+  const getEffectiveModelId = useModelStore((s) => s.getEffectiveModelId);
   const remaining = useRemainingFreePrompts();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const openUpgradeModal = useUsageStore((s) => s.openUpgradeModal);
@@ -23,12 +23,13 @@ export function NewChatHome() {
   const [notice, setNotice] = useState<string | null>(null);
 
   async function handleSend(content: string) {
+    const activeModelId = getEffectiveModelId();
     if (!isAuthenticated) {
       setError("Please log in to start chatting.");
       return;
     }
-    if (!isModelAvailable(selectedModelId)) {
-      setNotice(`${getModelName(selectedModelId)} isn't available yet — coming soon! Try GPT for now.`);
+    if (!isModelAvailable(activeModelId)) {
+      setNotice(`${getModelName(activeModelId)} isn't available yet — coming soon! Try GPT for now.`);
       return;
     }
     if (remaining <= 0) {
@@ -39,7 +40,7 @@ export function NewChatHome() {
     setNotice(null);
     setIsSending(true);
     try {
-      const chatId = await sendMessage(content, selectedModelId);
+      const chatId = await sendMessage(content, activeModelId);
       router.push(ROUTES.chat(chatId));
     } catch (err) {
       if (isLimitReachedError(err)) {

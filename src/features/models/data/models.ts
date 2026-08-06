@@ -9,6 +9,38 @@ import mistralLogo from "@/assets/logos/mistral.png";
 import qwenLogo from "@/assets/logos/qwen.webp";
 import type { AiModel } from "../types";
 
+export interface GptVariant {
+  id: string;
+  name: string;
+  description: string;
+  badge?: string;
+  speed: "fast" | "standard" | "slower";
+}
+
+export const GPT_VARIANTS: GptVariant[] = [
+  {
+    id: "gpt-5.6-sol",
+    name: "GPT-5.6 Sol",
+    description: "Balanced reasoning & creative problem solving",
+    badge: "Sol",
+    speed: "fast",
+  },
+  {
+    id: "gpt-5.6-tera",
+    name: "GPT-5.6 Tera",
+    description: "High performance for complex math, coding & reasoning",
+    badge: "Tera",
+    speed: "standard",
+  },
+  {
+    id: "gpt-5.6-luna",
+    name: "GPT-5.6 Luna",
+    description: "Lightweight, ultra-fast response model",
+    badge: "Luna",
+    speed: "fast",
+  },
+];
+
 export const AI_MODELS: AiModel[] = [
   {
     id: "gpt-omni",

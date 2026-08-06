@@ -1,16 +1,53 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { Switch } from "@/components/atoms/Switch";
 import { AI_MODELS } from "@/features/models/data/models";
 import { useSettingsStore } from "@/store/useSettingsStore";
+import { settingsService } from "../services/settingsService";
+import { getApiErrorMessage } from "@/services/httpClient";
 
 export function ModelConnectionsList() {
   const connectedModelIds = useSettingsStore((s) => s.connectedModelIds);
   const toggleConnectedModel = useSettingsStore((s) => s.toggleConnectedModel);
+  const [error, setError] = useState<string | null>(null);
+
+  const connectedAvailableCount = AI_MODELS.filter(
+    (m) => m.available && connectedModelIds.includes(m.id),
+  ).length;
+
+  async function handleToggle(modelId: string, model: (typeof AI_MODELS)[number]) {
+    setError(null);
+    const isConnected = connectedModelIds.includes(modelId);
+
+    // Don't let the last connected *working* model be turned off — that
+    // would leave the chat composer with nothing usable.
+    if (isConnected && model.available && connectedAvailableCount <= 1) {
+      setError(`${model.name} must stay connected — it's your only working model.`);
+      return;
+    }
+
+    toggleConnectedModel(modelId);
+    const nextIds = isConnected
+      ? connectedModelIds.filter((id) => id !== modelId)
+      : [...connectedModelIds, modelId];
+
+    try {
+      await settingsService.updatePreferences({ connectedModelIds: nextIds });
+    } catch (err) {
+      toggleConnectedModel(modelId); // revert
+      setError(getApiErrorMessage(err));
+    }
+  }
 
   return (
     <>
+      {error && (
+        <p role="alert" className="mx-4 my-2 rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          {error}
+        </p>
+      )}
       {AI_MODELS.map((model) => (
         <div key={model.id} className="flex items-center justify-between gap-4 px-4 py-3.5">
           <div className="flex min-w-0 items-center gap-3">
@@ -32,7 +69,7 @@ export function ModelConnectionsList() {
           </div>
           <Switch
             checked={connectedModelIds.includes(model.id)}
-            onCheckedChange={() => toggleConnectedModel(model.id)}
+            onCheckedChange={() => handleToggle(model.id, model)}
           />
         </div>
       ))}

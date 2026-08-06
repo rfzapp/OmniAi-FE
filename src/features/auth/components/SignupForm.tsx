@@ -6,10 +6,12 @@ import { Input } from "@/components/atoms/Input";
 import { Button } from "@/components/atoms/Button";
 import { Label } from "@/components/ui/label";
 import { authService } from "../services/authService";
+import { usePreferencesSync } from "@/features/settings/hooks/usePreferencesSync";
 import { getApiErrorMessage } from "@/services/httpClient";
 
 export function SignupForm({ redirectTo }: { redirectTo: string }) {
   const router = useRouter();
+  const syncPreferences = usePreferencesSync();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,6 +24,7 @@ export function SignupForm({ redirectTo }: { redirectTo: string }) {
     setIsSubmitting(true);
     try {
       await authService.register(name, email, password);
+      await syncPreferences().catch(() => {});
       router.push(redirectTo);
     } catch (err) {
       setError(getApiErrorMessage(err));

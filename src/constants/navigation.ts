@@ -14,6 +14,8 @@ import { ROUTES } from "./routes";
 
 export interface SettingsNavItem {
   label: string;
+  /** Shorter label for the narrow horizontal-scroll tab bar on mobile. */
+  shortLabel?: string;
   href: string;
   icon: LucideIcon;
   description: string;
@@ -34,18 +36,21 @@ export const SETTINGS_NAV: SettingsNavItem[] = [
   },
   {
     label: "Connected AI Models",
+    shortLabel: "Models",
     href: ROUTES.settingsModels,
     icon: Cpu,
     description: "Manage which providers are enabled",
   },
   {
     label: "API Keys",
+    shortLabel: "Keys",
     href: ROUTES.settingsApiKeys,
     icon: KeyRound,
     description: "Bring your own keys for each provider",
   },
   {
     label: "Chat History",
+    shortLabel: "History",
     href: ROUTES.settingsHistory,
     icon: History,
     description: "Export or clear your conversation history",
@@ -58,6 +63,7 @@ export const SETTINGS_NAV: SettingsNavItem[] = [
   },
   {
     label: "Notifications",
+    shortLabel: "Alerts",
     href: ROUTES.settingsNotifications,
     icon: Bell,
     description: "Email and in-app notification preferences",
@@ -70,6 +76,7 @@ export const SETTINGS_NAV: SettingsNavItem[] = [
   },
   {
     label: "Subscription",
+    shortLabel: "Plan",
     href: ROUTES.settingsSubscription,
     icon: Sparkles,
     description: "Plan, billing, and usage",
