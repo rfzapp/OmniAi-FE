@@ -26,10 +26,10 @@ export const GPT_VARIANTS: GptVariant[] = [
     speed: "fast",
   },
   {
-    id: "gpt-5.6-tera",
-    name: "GPT-5.6 Tera",
+    id: "gpt-5.6-terra",
+    name: "GPT-5.6 Terra",
     description: "High performance for complex math, coding & reasoning",
-    badge: "Tera",
+    badge: "Terra",
     speed: "standard",
   },
   {

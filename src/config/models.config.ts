@@ -3,12 +3,12 @@ import { AI_MODELS, GPT_VARIANTS } from "@/features/models/data/models";
 export const DEFAULT_MODEL_ID = "gpt-omni";
 export const DEFAULT_GPT_VARIANT_ID = "gpt-5.6-sol";
 
-/** Real OpenAI model string used for the one model actually wired up on the backend. */
+/** Real OpenAI model string mapped per variant. */
 const API_MODEL_MAP: Record<string, string> = {
-  "gpt-omni": "gpt-4.1-mini",
-  "gpt-5.6-sol": "gpt-4.1-mini",
-  "gpt-5.6-tera": "gpt-4.1-mini",
-  "gpt-5.6-luna": "gpt-4.1-mini",
+  "gpt-omni":       "gpt-5.6-sol",   // default GPT — maps to Sol
+  "gpt-5.6-sol":    "gpt-5.6-sol",   // Sol — balanced reasoning & creativity
+  "gpt-5.6-terra":  "gpt-5.6-terra", // Terra — high performance, complex tasks
+  "gpt-5.6-luna":   "gpt-5.6-luna",  // Luna — lightweight, ultra-fast
 };
 
 export function resolveApiModel(modelId: string): string {
