@@ -19,8 +19,8 @@ export function LogoMark({ className, size = 28 }: { className?: string; size?: 
     >
       <defs>
         <linearGradient id="omni-logo-gradient" x1="0" y1="0" x2="32" y2="32">
-          <stop offset="0%" stopColor="var(--brand-400)" />
-          <stop offset="100%" stopColor="var(--brand-700)" />
+          <stop offset="0%" stopColor="#2a2a2a" />
+          <stop offset="100%" stopColor="#0d0d0d" />
         </linearGradient>
       </defs>
       <rect width="32" height="32" rx="9" fill="url(#omni-logo-gradient)" />

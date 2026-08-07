@@ -20,7 +20,7 @@ export function SpeedIndicator({ speed }: { speed: SpeedTier }) {
               bar === 1 && "h-1.5",
               bar === 2 && "h-2.5",
               bar === 3 && "h-3.5",
-              bar <= bars && "bg-brand-500"
+              bar <= bars && "bg-foreground/70"
             )}
           />
         ))}

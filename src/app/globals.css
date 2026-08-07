@@ -107,12 +107,12 @@
   --surface-2: #f0f1f5;
   --sidebar: #f8f9fb;
   --sidebar-foreground: #111827;
-  --sidebar-primary: var(--brand-600);
+  --sidebar-primary: #0d0d0d;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #eeecfc;
+  --sidebar-accent: #f0f0f0;
   --sidebar-accent-foreground: #111827;
   --sidebar-border: #e5e7eb;
-  --sidebar-ring: var(--brand-400);
+  --sidebar-ring: #0d0d0d;
 }
 
 .dark {
@@ -145,7 +145,7 @@
   --destructive: oklch(0.704 0.191 22.216);
   --border: #e5e7eb;
   --input: #e5e7eb;
-  --ring: var(--brand-400);
+  --ring: #0d0d0d;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -156,12 +156,12 @@
   --surface-2: #f0f1f5;
   --sidebar: #f8f9fb;
   --sidebar-foreground: #111827;
-  --sidebar-primary: var(--brand-600);
+  --sidebar-primary: #0d0d0d;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #eeecfc;
+  --sidebar-accent: #f0f0f0;
   --sidebar-accent-foreground: #111827;
   --sidebar-border: #e5e7eb;
-  --sidebar-ring: var(--brand-400);
+  --sidebar-ring: #0d0d0d;
 }
 
 @layer base {
@@ -271,8 +271,8 @@
   .brand-gradient-text {
     background: linear-gradient(
       135deg,
-      var(--brand-500),
-      var(--brand-700)
+      #2a2a2a,
+      #0d0d0d
     );
     -webkit-background-clip: text;
     background-clip: text;

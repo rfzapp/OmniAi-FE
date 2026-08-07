@@ -39,7 +39,7 @@ export function SettingsNav() {
               className={cn(
                 "flex shrink-0 items-center gap-1 rounded-full border border-transparent px-2.5 py-1.5 text-xs font-medium whitespace-nowrap text-muted-foreground transition-colors",
                 active
-                  ? "border-brand-200 bg-brand-100 text-brand-700 dark:border-brand-800 dark:bg-brand-900/40 dark:text-brand-300"
+                  ? "border-border bg-muted text-foreground"
                   : "hover:bg-muted"
               )}
             >

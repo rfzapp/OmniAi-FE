@@ -52,7 +52,7 @@ export function ChatEmptyState({ onSend, disabled, statusMessage, statusIsError 
                 "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-400",
               !statusIsError &&
                 (isUnlimited || remaining >= 2) &&
-                "border-brand-200 bg-brand-50 text-brand-700"
+                "border-border bg-muted text-foreground"
             )}
           >
             <Zap className="size-3.5" />

@@ -27,7 +27,7 @@ export function IconButton({
       aria-label={label}
       data-active={active || undefined}
       className={cn(
-        "text-muted-foreground data-[active]:bg-brand-100 data-[active]:text-brand-700 dark:data-[active]:bg-brand-900/40 dark:data-[active]:text-brand-300",
+        "text-muted-foreground data-[active]:bg-muted data-[active]:text-foreground",
         className
       )}
       {...props}

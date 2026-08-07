@@ -45,7 +45,7 @@ export function ProfileMenu({ collapsed, onNavigate }: ProfileMenuProps) {
         )}
       >
         <Avatar size="sm">
-          <AvatarFallback className="bg-brand-100 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300">
+          <AvatarFallback className="bg-muted text-foreground">
             {getUserInitials(user)}
           </AvatarFallback>
         </Avatar>

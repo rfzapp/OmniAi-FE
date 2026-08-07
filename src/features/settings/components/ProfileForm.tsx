@@ -20,7 +20,7 @@ export function ProfileForm() {
         <ProfileFields user={user} />
       ) : (
         <p className="text-sm text-muted-foreground">
-          <Link href={ROUTES.login} className="font-medium text-brand-600 hover:underline">
+          <Link href={ROUTES.login} className="font-medium text-foreground underline hover:text-foreground/70">
             Log in
           </Link>{" "}
           to edit your profile.
@@ -64,7 +64,7 @@ function ProfileFields({ user }: { user: AuthUser }) {
       <div className="flex items-center gap-3">
         <Avatar size="lg">
           <AvatarImage src={avatarUrl || undefined} alt={user.fullName} />
-          <AvatarFallback className="bg-brand-100 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300">
+          <AvatarFallback className="bg-muted text-foreground">
             {getUserInitials(user)}
           </AvatarFallback>
         </Avatar>

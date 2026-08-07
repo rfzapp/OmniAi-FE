@@ -20,7 +20,7 @@ export function ForgotPasswordForm() {
   if (submitted) {
     return (
       <div className="flex flex-col items-center gap-3 text-center">
-        <div className="flex size-10 items-center justify-center rounded-full bg-brand-100 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300">
+        <div className="flex size-10 items-center justify-center rounded-full bg-muted text-foreground">
           <Mail className="size-5" />
         </div>
         <p className="text-sm text-muted-foreground">
@@ -29,7 +29,7 @@ export function ForgotPasswordForm() {
         </p>
         <Link
           href={ROUTES.resetPassword}
-          className="text-xs font-medium text-brand-600 hover:underline"
+          className="text-xs font-medium text-foreground/60 hover:underline"
         >
           Simulate opening the reset link
         </Link>
