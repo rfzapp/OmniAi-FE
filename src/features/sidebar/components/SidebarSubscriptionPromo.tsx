@@ -22,6 +22,7 @@ export function SidebarSubscriptionPromo() {
         type="button"
         onClick={() => setDismissed(true)}
         aria-label="Dismiss"
+        suppressHydrationWarning
         className="absolute top-1.5 right-1.5 rounded-md p-1 text-brand-700/60 transition-colors hover:bg-brand-100 hover:text-brand-700 dark:text-brand-300/60 dark:hover:bg-brand-900/40"
       >
         <X className="size-3.5" />
@@ -36,6 +37,7 @@ export function SidebarSubscriptionPromo() {
       <button
         type="button"
         onClick={goToSubscription}
+        suppressHydrationWarning
         className="mt-2 w-full rounded-lg bg-brand-600 py-1.5 text-xs font-medium text-white transition-colors hover:bg-brand-700"
       >
         See plans

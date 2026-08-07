@@ -43,7 +43,16 @@ const components: Components = {
     <th className="border-b border-border px-3 py-1.5 text-left font-medium">{children}</th>
   ),
   td: ({ children }) => <td className="border-b border-border px-3 py-1.5">{children}</td>,
-  pre: ({ children }) => <>{children}</>,
+  img: ({ src, alt }) => {
+    if (!src) return null;
+    return (
+      <img
+        src={src}
+        alt={alt ?? "Image"}
+        className="my-2 max-w-sm rounded-xl border border-border shadow-sm"
+      />
+    );
+  },
   code: (props) => {
     const { className, children } = props as {
       className?: string;

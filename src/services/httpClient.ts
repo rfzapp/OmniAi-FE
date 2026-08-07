@@ -49,16 +49,24 @@ let refreshPromise: Promise<string | null> | null = null;
 
 function refreshAccessToken(): Promise<string | null> {
   if (!refreshPromise) {
-    refreshPromise = rawRequest<{ accessToken: string }>("/auth/refresh", {
+    const storedRefreshToken = useAuthStore.getState().refreshToken;
+    const body = storedRefreshToken ? JSON.stringify({ refreshToken: storedRefreshToken }) : undefined;
+
+    refreshPromise = rawRequest<{ accessToken: string; refreshToken?: string }>("/auth/refresh", {
       method: "POST",
+      body,
       skipAuthRefresh: true,
     })
       .then((data) => {
-        useAuthStore.getState().setAccessToken(data.accessToken);
+        useAuthStore.getState().setAccessToken(data.accessToken, data.refreshToken);
         return data.accessToken;
       })
       .catch(() => {
-        useAuthStore.getState().clearSession();
+        // Only clear session if we have no fallback refresh token stored —
+        // a network blip shouldn't log the user out.
+        if (!storedRefreshToken) {
+          useAuthStore.getState().clearSession();
+        }
         return null;
       })
       .finally(() => {

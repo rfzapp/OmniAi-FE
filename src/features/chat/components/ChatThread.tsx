@@ -13,26 +13,31 @@ import { ROUTES } from "@/constants/routes";
 
 export function ChatThread({ chatId }: { chatId: string }) {
   const router = useRouter();
-  const { messages, streamingMessageId, isStreaming, chatNotFound, sendMessage, toggleReaction, regenerateMessage } =
+  const { messages, streamingMessageId, isStreaming, chatNotFound, sendMessage, stopStreaming, toggleReaction, regenerateMessage } =
     useChat(chatId);
   const getEffectiveModelId = useModelStore((s) => s.getEffectiveModelId);
   const remaining = useRemainingFreePrompts();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const hasHydrated = useAuthStore((s) => s.hasHydrated);
   const openUpgradeModal = useUsageStore((s) => s.openUpgradeModal);
   const limitReached = remaining <= 0;
 
   useEffect(() => {
-    // Stale/foreign URL (deleted chat, wrong account, bad id) — bounce back
-    // to a fresh chat instead of leaving the user stuck on a dead thread.
     if (chatNotFound) router.replace(ROUTES.home);
   }, [chatNotFound, router]);
 
   useEffect(() => {
-    // Reached an existing chat's URL directly while logged out (or the
-    // session expired mid-visit) — send to login instead of letting a send
-    // attempt surface a raw backend error.
+    if (!hasHydrated) return;
     if (!isAuthenticated) router.replace(`${ROUTES.login}?redirect=${encodeURIComponent(ROUTES.chat(chatId))}`);
-  }, [isAuthenticated, router, chatId]);
+  }, [hasHydrated, isAuthenticated, router, chatId]);
+
+  // Don't render anything until Zustand rehydrates — prevents a flash
+  // of redirect to login on every page reload for authenticated users.
+  if (!hasHydrated) return (
+    <div className="flex h-full items-center justify-center">
+      <div className="size-5 animate-spin rounded-full border-2 border-border border-t-brand-600" />
+    </div>
+  );
 
   return (
     <ChatLayoutTemplate
@@ -48,6 +53,8 @@ export function ChatThread({ chatId }: { chatId: string }) {
       composer={
         <ComposerBar
           disabled={isStreaming}
+          isStreaming={isStreaming}
+          onStop={stopStreaming}
           onSend={async (content) => {
             if (!isAuthenticated) return;
             // Not pre-disabling on limitReached: a disabled composer can't

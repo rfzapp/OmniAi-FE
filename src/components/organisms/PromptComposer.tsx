@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { ArrowUp, Paperclip } from "lucide-react";
+import { ArrowUp, Paperclip, Square } from "lucide-react";
 import { Textarea } from "@/components/atoms/Textarea";
 import { IconButton } from "@/components/atoms/IconButton";
 import { AttachmentPreview } from "@/features/prompt/components/AttachmentPreview";
@@ -11,6 +11,8 @@ import { cn } from "@/lib/utils";
 
 interface PromptComposerProps {
   onSend: (content: string) => void | Promise<void>;
+  onStop?: () => void;
+  isStreaming?: boolean;
   disabled?: boolean;
   placeholder?: string;
   className?: string;
@@ -18,6 +20,8 @@ interface PromptComposerProps {
 
 export function PromptComposer({
   onSend,
+  onStop,
+  isStreaming,
   disabled,
   placeholder = "Message OmniAI…",
   className,
@@ -30,7 +34,7 @@ export function PromptComposer({
   return (
     <div
       className={cn(
-        "w-full rounded-2xl border border-border bg-card shadow-sm transition-shadow duration-200 focus-within:border-brand-300 focus-within:shadow-[0_0_0_4px_rgba(124,92,252,0.1)]",
+        "rainbow-border w-full rounded-2xl bg-card shadow-sm",
         className
       )}
     >
@@ -67,15 +71,26 @@ export function PromptComposer({
           className="min-h-9 flex-1 resize-none border-0 bg-transparent px-1.5 py-1.5 text-sm shadow-none focus-visible:ring-0 md:text-base"
         />
 
-        <button
-          type="button"
-          onClick={submit}
-          disabled={disabled || !value.trim()}
-          aria-label="Send message"
-          className="mb-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform enabled:hover:scale-105 disabled:opacity-40"
-        >
-          <ArrowUp className="size-4" />
-        </button>
+        {isStreaming ? (
+          <button
+            type="button"
+            onClick={onStop}
+            aria-label="Stop response"
+            className="mb-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-[#0d0d0d] text-white transition-transform hover:scale-105 hover:bg-[#2a2a2a]"
+          >
+            <Square className="size-3.5 fill-current" />
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={submit}
+            disabled={disabled || !value.trim()}
+            aria-label="Send message"
+            className="mb-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-[#0d0d0d] text-white transition-transform enabled:hover:scale-105 enabled:hover:bg-[#2a2a2a] disabled:opacity-30"
+          >
+            <ArrowUp className="size-4" />
+          </button>
+        )}
       </div>
     </div>
   );
