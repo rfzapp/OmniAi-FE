@@ -57,7 +57,7 @@ export function LoginForm({ redirectTo }: { redirectTo: string }) {
           <Label htmlFor="login-password">Password</Label>
           <Link
             href={ROUTES.forgotPassword}
-            className="text-xs font-medium text-brand-600 hover:underline"
+            className="text-xs font-medium text-foreground/60 hover:underline"
           >
             Forgot password?
           </Link>

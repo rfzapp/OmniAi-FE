@@ -35,7 +35,7 @@ export function ChatThread({ chatId }: { chatId: string }) {
   // of redirect to login on every page reload for authenticated users.
   if (!hasHydrated) return (
     <div className="flex h-full items-center justify-center">
-      <div className="size-5 animate-spin rounded-full border-2 border-border border-t-brand-600" />
+      <div className="size-5 animate-spin rounded-full border-2 border-border border-t-[#0d0d0d]" />
     </div>
   );
 

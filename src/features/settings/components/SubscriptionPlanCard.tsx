@@ -48,7 +48,7 @@ export function SubscriptionPlanCard() {
             key={plan.key}
             className={cn(
               "flex flex-col gap-3 rounded-xl border p-4",
-              plan.highlighted ? "border-brand-400 bg-brand-50/50 dark:bg-brand-950/20" : "border-border"
+              plan.highlighted ? "border-[#0d0d0d] bg-[#0d0d0d]/5" : "border-border"
             )}
           >
             <div>
@@ -58,7 +58,7 @@ export function SubscriptionPlanCard() {
             <ul className="flex flex-1 flex-col gap-1.5">
               {plan.features.map((feature) => (
                 <li key={feature} className="flex items-start gap-1.5 text-xs text-muted-foreground">
-                  <Check className="mt-0.5 size-3 shrink-0 text-brand-600" />
+                  <Check className="mt-0.5 size-3 shrink-0 text-foreground" />
                   {feature}
                 </li>
               ))}

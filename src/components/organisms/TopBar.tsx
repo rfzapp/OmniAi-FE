@@ -31,8 +31,8 @@ export function TopBar() {
 
       <div className="flex items-center gap-1.5 sm:gap-2.5">
         {isUnlimited ? (
-          <span className="hidden items-center gap-1.5 rounded-full border border-brand-200 bg-brand-50 px-3 py-1.5 text-xs font-medium text-brand-700 sm:flex">
-            <Zap className="size-3.5 text-brand-600" />
+          <span className="hidden items-center gap-1.5 rounded-full border border-border bg-muted px-3 py-1.5 text-xs font-medium text-foreground sm:flex">
+            <Zap className="size-3.5 text-foreground" />
             Pro — Unlimited
           </span>
         ) : (
@@ -40,16 +40,16 @@ export function TopBar() {
             <button
               type="button"
               onClick={openUpgradeModal}
-              className="hidden items-center gap-1.5 rounded-full border border-border bg-secondary px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-brand-300 hover:text-foreground sm:flex"
+              className="hidden items-center gap-1.5 rounded-full border border-border bg-secondary px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground sm:flex"
             >
-              <Zap className="size-3.5 text-brand-600" />
+              <Zap className="size-3.5 text-foreground/60" />
               {remaining} / {FREE_PROMPT_LIMIT} Free Prompts
             </button>
             <Button
               type="button"
               size="sm"
               onClick={openUpgradeModal}
-              className="rounded-full px-3.5 shadow-sm shadow-brand-600/20"
+              className="rounded-full px-3.5 shadow-sm"
             >
               Upgrade
             </Button>
@@ -68,7 +68,7 @@ export function TopBar() {
         ) : (
           <Link
             href={ROUTES.login}
-            className="rounded-full border border-border px-3.5 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-brand-300 hover:bg-muted"
+            className="rounded-full border border-border px-3.5 py-1.5 text-xs font-medium text-foreground transition-colors hover:border-foreground/30 hover:bg-muted"
           >
             Log in
           </Link>

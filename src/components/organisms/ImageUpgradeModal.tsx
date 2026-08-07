@@ -46,7 +46,7 @@ export function ImageUpgradeModal() {
     <Dialog open={open} onOpenChange={(next) => !next && closeImageUpgradeModal()}>
       <DialogContent className="max-w-md">
         <DialogHeader className="items-center text-center">
-          <div className="flex size-12 items-center justify-center rounded-2xl bg-brand-100 text-brand-600">
+          <div className="flex size-12 items-center justify-center rounded-2xl bg-muted text-foreground">
             <ImageIcon className="size-6" />
           </div>
           <DialogTitle className="mt-2 text-xl">Unlock Image Generation</DialogTitle>
@@ -62,12 +62,12 @@ export function ImageUpgradeModal() {
               className={cn(
                 "relative flex flex-col gap-3 rounded-xl border p-4",
                 plan.highlighted
-                  ? "border-brand-400 bg-brand-50 dark:bg-brand-950/30"
+                  ? "border-[#0d0d0d] bg-[#0d0d0d]/5"
                   : "border-border bg-card",
               )}
             >
               {plan.highlighted && (
-                <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 rounded-full bg-brand-600 px-2.5 py-0.5 text-[10px] font-semibold text-white">
+                <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 rounded-full bg-[#0d0d0d] px-2.5 py-0.5 text-[10px] font-semibold text-white">
                   Most popular
                 </span>
               )}
@@ -78,7 +78,7 @@ export function ImageUpgradeModal() {
               <ul className="flex flex-col gap-1.5">
                 {plan.features.map((f) => (
                   <li key={f} className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <Check className="size-3 shrink-0 text-brand-600" />
+                    <Check className="size-3 shrink-0 text-foreground" />
                     {f}
                   </li>
                 ))}

@@ -14,7 +14,7 @@ const components: Components = {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="text-brand-600 underline underline-offset-2 hover:text-brand-700 dark:text-brand-400"
+      className="text-foreground underline underline-offset-2 hover:text-foreground/70"
     >
       {children}
     </a>

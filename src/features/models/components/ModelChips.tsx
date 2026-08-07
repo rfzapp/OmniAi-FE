@@ -63,8 +63,8 @@ export function ModelChips({ className }: { className?: string }) {
                 className={cn(
                   "flex shrink-0 items-center gap-2 rounded-xl border bg-card py-1.5 pr-3 pl-1.5 text-sm font-medium shadow-sm transition-all cursor-pointer outline-none",
                   selected
-                    ? "border-brand-500 ring-1 ring-brand-500 bg-brand-50/40 text-foreground"
-                    : "border-border hover:border-brand-300"
+                    ? "border-[#0d0d0d] ring-1 ring-[#0d0d0d] bg-muted/40 text-foreground"
+                    : "border-border hover:border-foreground/30"
                 )}
               >
                 <span className="flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white ring-1 ring-black/5">
@@ -105,13 +105,13 @@ export function ModelChips({ className }: { className?: string }) {
                           className={cn(
                             "flex w-full items-start gap-2.5 rounded-xl p-2.5 text-left cursor-pointer transition-colors outline-none",
                             isVariantSelected
-                              ? "bg-brand-50 text-brand-950 dark:bg-brand-900/30 dark:text-brand-100 font-medium"
+                              ? "bg-muted text-foreground font-medium"
                               : "hover:bg-muted/80 text-foreground"
                           )}
                         >
                           <div className="mt-0.5 flex size-4 shrink-0 items-center justify-center">
                             {isVariantSelected ? (
-                              <Check className="size-4 text-brand-600" />
+                              <Check className="size-4 text-foreground" />
                             ) : (
                               <div className="size-1.5 rounded-full bg-muted-foreground/30" />
                             )}
@@ -122,7 +122,7 @@ export function ModelChips({ className }: { className?: string }) {
                                 {variant.name}
                               </span>
                               {variant.badge && (
-                                <span className="rounded-full bg-brand-100 px-2 py-0.5 text-[10px] font-medium text-brand-700 dark:bg-brand-900/50 dark:text-brand-300">
+                                <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-foreground/70">
                                   {variant.badge}
                                 </span>
                               )}
@@ -154,8 +154,8 @@ export function ModelChips({ className }: { className?: string }) {
             className={cn(
               "flex shrink-0 items-center gap-2 rounded-xl border bg-card py-1.5 pr-3.5 pl-1.5 text-sm font-medium shadow-sm transition-colors",
               selected
-                ? "border-brand-500 ring-1 ring-brand-500"
-                : "border-border hover:border-brand-300"
+                ? "border-[#0d0d0d] ring-1 ring-[#0d0d0d]"
+                : "border-border hover:border-foreground/30"
             )}
           >
             <span

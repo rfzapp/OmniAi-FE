@@ -17,28 +17,28 @@ export function SidebarSubscriptionPromo() {
   if (dismissed || isUnlimited) return null;
 
   return (
-    <div className="relative mx-1 mb-2 rounded-xl border border-brand-200 bg-brand-50 p-3 dark:border-brand-900 dark:bg-brand-950/30">
+    <div className="relative mx-1 mb-2 rounded-xl border border-border bg-muted/50 p-3">
       <button
         type="button"
         onClick={() => setDismissed(true)}
         aria-label="Dismiss"
         suppressHydrationWarning
-        className="absolute top-1.5 right-1.5 rounded-md p-1 text-brand-700/60 transition-colors hover:bg-brand-100 hover:text-brand-700 dark:text-brand-300/60 dark:hover:bg-brand-900/40"
+        className="absolute top-1.5 right-1.5 rounded-md p-1 text-foreground/40 transition-colors hover:bg-muted hover:text-foreground"
       >
         <X className="size-3.5" />
       </button>
       <div className="flex items-center gap-1.5 pr-5">
-        <Sparkles className="size-3.5 shrink-0 text-brand-600 dark:text-brand-400" />
-        <p className="text-xs font-semibold text-brand-800 dark:text-brand-200">Upgrade to Pro</p>
+        <Sparkles className="size-3.5 shrink-0 text-foreground" />
+        <p className="text-xs font-semibold text-foreground">Upgrade to Pro</p>
       </div>
-      <p className="mt-1 text-[11px] leading-snug text-brand-700/80 dark:text-brand-300/70">
+      <p className="mt-1 text-[11px] leading-snug text-muted-foreground">
         Unlock unlimited prompts and every model.
       </p>
       <button
         type="button"
         onClick={goToSubscription}
         suppressHydrationWarning
-        className="mt-2 w-full rounded-lg bg-brand-600 py-1.5 text-xs font-medium text-white transition-colors hover:bg-brand-700"
+        className="mt-2 w-full rounded-lg bg-[#0d0d0d] py-1.5 text-xs font-medium text-white transition-colors hover:bg-[#2a2a2a]"
       >
         See plans
       </button>

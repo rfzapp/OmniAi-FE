@@ -21,7 +21,7 @@ export function UpgradeModal() {
     <Dialog open={open} onOpenChange={(next) => !next && closeUpgradeModal()}>
       <DialogContent className="max-w-sm text-center sm:max-w-sm">
         <DialogHeader className="items-center">
-          <div className="flex size-12 items-center justify-center rounded-2xl bg-brand-100 text-brand-600">
+          <div className="flex size-12 items-center justify-center rounded-2xl bg-muted text-foreground">
             <Zap className="size-6 fill-current" />
           </div>
           <DialogTitle className="mt-2 text-xl">Unlock Unlimited Intelligence</DialogTitle>
