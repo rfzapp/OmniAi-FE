@@ -9,6 +9,7 @@ export interface Message {
   content: string;
   createdAt: string;
   modelId?: string;
+  imageUrl?: string;
   liked?: boolean;
   disliked?: boolean;
 }

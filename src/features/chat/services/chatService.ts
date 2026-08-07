@@ -15,6 +15,7 @@ interface BackendMessage {
   role: MessageRole;
   content: string;
   model?: string;
+  imageUrl?: string | null;
   createdAt: string;
 }
 
@@ -35,6 +36,7 @@ function toMessage(message: BackendMessage, chatId: string): Message {
     content: message.content,
     createdAt: message.createdAt,
     modelId: message.model,
+    imageUrl: message.imageUrl ?? undefined,
   };
 }
 

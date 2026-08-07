@@ -56,6 +56,14 @@ export function MessageBubble({
       <div className="min-w-0 flex-1 text-[#0D0D0D] md:text-[15px]">
         {showTyping ? (
           <TypingIndicator />
+        ) : message.imageUrl ? (
+          <div className="flex flex-col gap-3">
+            <img
+              src={message.imageUrl}
+              alt="Generated image"
+              className="max-w-sm rounded-xl border border-border shadow-sm"
+            />
+          </div>
         ) : (
           <MessageMarkdown content={message.content} />
         )}

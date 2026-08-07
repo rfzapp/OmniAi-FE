@@ -4,6 +4,7 @@ import { useAuthStore, type AuthUser } from "@/store/useAuthStore";
 interface AuthResponse {
   user: AuthUser;
   accessToken: string;
+  refreshToken?: string;
 }
 
 export const authService = {
@@ -13,13 +14,19 @@ export const authService = {
       { fullName, email, password },
       { skipAuthRefresh: true },
     );
-    useAuthStore.getState().setSession(data.user, data.accessToken);
+    // Store refreshToken as fallback for when the httpOnly cookie is
+    // unavailable (cross-origin deployments, incognito, Safari ITP, etc.)
+    useAuthStore.getState().setSession(data.user, data.accessToken, data.refreshToken);
     return data.user;
   },
 
   async login(email: string, password: string): Promise<AuthUser> {
-    const data = await httpClient.post<AuthResponse>("/auth/login", { email, password }, { skipAuthRefresh: true });
-    useAuthStore.getState().setSession(data.user, data.accessToken);
+    const data = await httpClient.post<AuthResponse>(
+      "/auth/login",
+      { email, password },
+      { skipAuthRefresh: true },
+    );
+    useAuthStore.getState().setSession(data.user, data.accessToken, data.refreshToken);
     return data.user;
   },
 

@@ -3,6 +3,7 @@ import { Sidebar } from "@/components/organisms/Sidebar";
 import { MobileSidebarSheet } from "@/components/organisms/MobileSidebarSheet";
 import { TopBar } from "@/components/organisms/TopBar";
 import { UpgradeModal } from "@/components/organisms/UpgradeModal";
+import { ImageUpgradeModal } from "@/components/organisms/ImageUpgradeModal";
 
 export function AppShell({ children }: { children: ReactNode }) {
   return (
@@ -14,6 +15,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <main className="flex min-h-0 flex-1 flex-col overflow-hidden">{children}</main>
       </div>
       <UpgradeModal />
+      <ImageUpgradeModal />
     </div>
   );
 }

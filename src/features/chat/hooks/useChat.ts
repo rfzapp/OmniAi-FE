@@ -14,13 +14,17 @@ function isNotFoundError(err: unknown): boolean {
 }
 
 export function isLimitReachedError(err: unknown): boolean {
-  return err instanceof ApiError && err.status === 403;
+  return err instanceof ApiError && err.status === 403 && !err.message.toLowerCase().includes("image");
 }
 
 export class ModelUnavailableError extends Error {}
 
 export function isModelUnavailableError(err: unknown): err is ModelUnavailableError {
   return err instanceof ModelUnavailableError;
+}
+
+export function isImageUpgradeError(err: unknown): boolean {
+  return err instanceof ApiError && err.status === 403 && err.message.toLowerCase().includes("image");
 }
 
 function createId(): string {
@@ -50,6 +54,7 @@ export function useChat(chatId?: string) {
   const removeMessage = useChatStore((s) => s.removeMessage);
   const setStreamingMessageId = useChatStore((s) => s.setStreamingMessageId);
   const streaming = useStreamingMessage();
+  const isAuthReady = useAuthStore((s) => s.hasHydrated && s.isAuthenticated);
   const [chatNotFound, setChatNotFound] = useState(false);
 
   const messages = (chatId && messagesByChat[chatId]) || [];
@@ -59,22 +64,25 @@ export function useChat(chatId?: string) {
       const list = await chatService.listChats();
       setChats(list);
     } catch (err) {
-      // Not logged in yet (or session expired) — leave the list empty
-      // instead of crashing; a later successful login will retry this.
       console.error("Failed to load chats:", err);
     }
   }, [setChats]);
 
   useEffect(() => {
-    if (!chatsLoaded) void loadChats();
-  }, [chatsLoaded, loadChats]);
+    const { hasHydrated, isAuthenticated } = useAuthStore.getState();
+    if (!hasHydrated || !isAuthenticated || chatsLoaded) return;
+    void loadChats();
+  }, [chatsLoaded, loadChats, isAuthReady]);
 
   useEffect(() => {
     setChatNotFound(false);
     if (!isValidChatId(chatId)) {
-      if (chatId) setChatNotFound(true); // well-formed-looking but invalid id
+      if (chatId) setChatNotFound(true);
       return;
     }
+    // Don't load messages until auth is ready — firing before hydration
+    // sends an unauthenticated request that can wipe the session.
+    if (!isAuthReady) return;
     if (messagesByChat[chatId]) return;
     chatService
       .listMessages(chatId)
@@ -87,7 +95,7 @@ export function useChat(chatId?: string) {
         }
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chatId]);
+  }, [chatId, isAuthReady]);
 
   const deleteChat = useCallback(
     async (id: string) => {
@@ -105,6 +113,11 @@ export function useChat(chatId?: string) {
     },
     [upsertChat]
   );
+
+  const stopStreaming = useCallback(() => {
+    streaming.stop();
+    setStreamingMessageId(null);
+  }, [streaming, setStreamingMessageId]);
 
   const sendMessage = useCallback(
     async (content: string, modelId: string, rawTargetChatId?: string): Promise<string> => {
@@ -168,6 +181,13 @@ export function useChat(chatId?: string) {
             setChatNotFound(true);
             return targetChatId;
           }
+          if (isImageUpgradeError(err)) {
+            updateMessage(targetChatId, assistantMessageId, {
+              content: "Image generation requires an Image Generation plan. Please subscribe to unlock it. 🔒",
+            });
+            useUsageStore.getState().openImageUpgradeModal();
+            return targetChatId;
+          }
           if (isLimitReachedError(err)) {
             removeMessage(targetChatId, assistantMessageId);
             useUsageStore.getState().openUpgradeModal();
@@ -196,8 +216,12 @@ export function useChat(chatId?: string) {
           content: "",
           createdAt: new Date().toISOString(),
           modelId,
+          imageUrl: result.message.imageUrl,
         });
         setStreamingMessageId(assistantMessageId);
+      } else if (result.message.imageUrl) {
+        // Existing chat image: set imageUrl on the placeholder immediately
+        updateMessage(activeChatId, assistantMessageId, { imageUrl: result.message.imageUrl });
       }
 
       streaming.start(
@@ -288,6 +312,7 @@ export function useChat(chatId?: string) {
     streamingMessageId,
     chatNotFound,
     sendMessage,
+    stopStreaming,
     deleteChat,
     renameChat,
     toggleReaction,
