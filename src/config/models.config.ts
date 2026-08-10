@@ -1,7 +1,7 @@
 import { AI_MODELS, GPT_VARIANTS } from "@/features/models/data/models";
 
 export const DEFAULT_MODEL_ID = "gpt-omni";
-export const DEFAULT_GPT_VARIANT_ID = "gpt-5.6-sol";
+export const DEFAULT_GPT_VARIANT_ID = "gpt-5.6-luna";
 
 /** Real OpenAI model string mapped per variant. */
 const API_MODEL_MAP: Record<string, string> = {

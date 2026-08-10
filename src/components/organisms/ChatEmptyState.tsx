@@ -20,7 +20,7 @@ export function ChatEmptyState({ onSend, disabled, statusMessage, statusIsError 
   const limitReached = remaining <= 0;
 
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center justify-center gap-6 px-4 pb-[24vh]">
+    <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center justify-center gap-6 px-4">
       <motion.p
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
