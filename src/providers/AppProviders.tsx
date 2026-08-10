@@ -19,7 +19,10 @@ function AuthBootstrap() {
     if (!hasHydrated) return;
 
     const { isAuthenticated, refreshToken } = useAuthStore.getState();
-    if (!isAuthenticated) return;
+    if (!isAuthenticated) {
+      useAuthStore.getState().setAuthBootstrapComplete(true);
+      return;
+    }
 
     void (async () => {
       try {
@@ -49,6 +52,8 @@ function AuthBootstrap() {
         await syncPreferences();
       } catch {
         // Silent fail — user will be redirected by guards if needed.
+      } finally {
+        useAuthStore.getState().setAuthBootstrapComplete(true);
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps

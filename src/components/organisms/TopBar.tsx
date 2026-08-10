@@ -38,6 +38,7 @@ export function TopBar() {
         ) : (
           <>
             <button
+              suppressHydrationWarning
               type="button"
               onClick={openUpgradeModal}
               className="hidden items-center gap-1.5 rounded-full border border-border bg-secondary px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground sm:flex"

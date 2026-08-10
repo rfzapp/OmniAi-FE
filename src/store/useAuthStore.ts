@@ -23,7 +23,11 @@ interface AuthState {
   // True once Zustand has rehydrated from localStorage — guards prevent
   // premature redirects firing on the default false isAuthenticated state.
   hasHydrated: boolean;
+  // True once the startup refresh/bootstrap sequence has finished. This
+  // prevents chat hydration from firing against an unrefreshed access token.
+  isAuthBootstrapComplete: boolean;
   setHasHydrated: (value: boolean) => void;
+  setAuthBootstrapComplete: (value: boolean) => void;
   setSession: (user: AuthUser, accessToken: string, refreshToken?: string) => void;
   setUser: (user: AuthUser) => void;
   setAccessToken: (accessToken: string, refreshToken?: string) => void;
@@ -39,7 +43,9 @@ export const useAuthStore = create<AuthState>()(
       refreshToken: null,
       isAuthenticated: false,
       hasHydrated: false,
+      isAuthBootstrapComplete: false,
       setHasHydrated: (value) => set({ hasHydrated: value }),
+      setAuthBootstrapComplete: (value) => set({ isAuthBootstrapComplete: value }),
       setSession: (user, accessToken, refreshToken) =>
         set({ user, accessToken, refreshToken: refreshToken ?? null, isAuthenticated: true }),
       setUser: (user) => set({ user, isAuthenticated: true }),
