@@ -19,10 +19,10 @@ export interface GptVariant {
 
 export const GPT_VARIANTS: GptVariant[] = [
   {
-    id: "gpt-5.6-sol",
-    name: "GPT-5.6 Sol",
-    description: "Balanced reasoning & creative problem solving",
-    badge: "Sol",
+    id: "gpt-5.6-luna",
+    name: "GPT-5.6 Luna",
+    description: "Lightweight, ultra-fast response model",
+    badge: "Luna",
     speed: "fast",
   },
   {
@@ -33,10 +33,10 @@ export const GPT_VARIANTS: GptVariant[] = [
     speed: "standard",
   },
   {
-    id: "gpt-5.6-luna",
-    name: "GPT-5.6 Luna",
-    description: "Lightweight, ultra-fast response model",
-    badge: "Luna",
+    id: "gpt-5.6-sol",
+    name: "GPT-5.6 Sol",
+    description: "Balanced reasoning & creative problem solving",
+    badge: "Sol",
     speed: "fast",
   },
 ];
