@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowUp, Paperclip, Square } from "lucide-react";
 import { Textarea } from "@/components/atoms/Textarea";
 import { IconButton } from "@/components/atoms/IconButton";
@@ -23,13 +23,30 @@ export function PromptComposer({
   onStop,
   isStreaming,
   disabled,
-  placeholder = "Message OmniAI…",
+  placeholder = "Ask me anything",
   className,
 }: PromptComposerProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { value, setValue, submit, handleKeyDown, attachments, addAttachment, removeAttachment } =
     useComposerSubmit({ onSend, disabled });
   const textareaRef = useAutoGrowTextarea(value);
+  const [activePlaceholder, setActivePlaceholder] = useState(0);
+
+  const rotatingPlaceholders = [
+    "Ask OmniAI to plan a launch and turn this idea into a roadmap",
+    "Summarize this report and highlight action items",
+    "Draft a reply that is clear, concise, and professional",
+    "Design a workflow and map the next best step",
+    "Create smart automation and decide what should happen first",
+  ];
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setActivePlaceholder((current) => (current + 1) % rotatingPlaceholders.length);
+    }, 5200);
+
+    return () => window.clearInterval(intervalId);
+  }, []);
 
   return (
     <div
@@ -65,7 +82,7 @@ export function PromptComposer({
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder={placeholder}
+          placeholder={rotatingPlaceholders[activePlaceholder] ?? placeholder}
           rows={1}
           disabled={disabled}
           className="min-h-9 flex-1 resize-none border-0 bg-transparent px-1.5 py-1.5 text-sm shadow-none focus-visible:ring-0 md:text-base"

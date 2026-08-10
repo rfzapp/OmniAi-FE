@@ -54,7 +54,7 @@ export function useChat(chatId?: string) {
   const removeMessage = useChatStore((s) => s.removeMessage);
   const setStreamingMessageId = useChatStore((s) => s.setStreamingMessageId);
   const streaming = useStreamingMessage();
-  const isAuthReady = useAuthStore((s) => s.hasHydrated && s.isAuthenticated);
+  const isAuthReady = useAuthStore((s) => s.hasHydrated && s.isAuthenticated && s.isAuthBootstrapComplete);
   const [chatNotFound, setChatNotFound] = useState(false);
 
   const messages = (chatId && messagesByChat[chatId]) || [];
@@ -69,8 +69,7 @@ export function useChat(chatId?: string) {
   }, [setChats]);
 
   useEffect(() => {
-    const { hasHydrated, isAuthenticated } = useAuthStore.getState();
-    if (!hasHydrated || !isAuthenticated || chatsLoaded) return;
+    if (!isAuthReady || chatsLoaded) return;
     void loadChats();
   }, [chatsLoaded, loadChats, isAuthReady]);
 

@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { LogoMark } from "@/components/atoms/Logo";
 import { MessageMarkdown } from "@/features/chat/components/MessageMarkdown";
 import { MessageActionsBar } from "@/components/molecules/MessageActionsBar";
-import { TypingIndicator } from "./TypingIndicator";
+import { ThinkingAnimation } from "@/components/ui/ThinkingAnimation";
 import type { Message } from "@/features/chat/types";
 
 interface MessageBubbleProps {
@@ -55,7 +55,9 @@ export function MessageBubble({
       </div>
       <div className="min-w-0 flex-1 text-[#0D0D0D] md:text-[15px]">
         {showTyping ? (
-          <TypingIndicator />
+          <div className="w-[560px] max-w-[min(560px,90vw)] min-w-[280px] rounded-2xl border border-border bg-white p-4 shadow-sm">
+            <ThinkingAnimation model={(message.modelId as "Luna" | "Sol" | "Terra") || "Luna"} />
+          </div>
         ) : message.imageUrl ? (
           <div className="flex flex-col gap-3">
             <img

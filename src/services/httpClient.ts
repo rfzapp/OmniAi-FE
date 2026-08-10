@@ -61,10 +61,16 @@ function refreshAccessToken(): Promise<string | null> {
         useAuthStore.getState().setAccessToken(data.accessToken, data.refreshToken);
         return data.accessToken;
       })
-      .catch(() => {
-        // Only clear session if we have no fallback refresh token stored —
-        // a network blip shouldn't log the user out.
-        if (!storedRefreshToken) {
+      .catch((err) => {
+        // If the refresh endpoint says the token is stale/invalid, the session
+        // is no longer recoverable in the browser. Clear it so the next UI
+        // boundary can redirect them back to sign-in instead of keeping a
+        // false 'authenticated' state that keeps failing protected reads.
+        if (err instanceof ApiError && err.status === 401) {
+          useAuthStore.getState().clearSession();
+        } else if (!storedRefreshToken) {
+          // Network-level blips without a stored refresh token can still be
+          // treated as a dead session. Keep the current behavior for that case.
           useAuthStore.getState().clearSession();
         }
         return null;

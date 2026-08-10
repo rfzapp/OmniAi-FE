@@ -167,7 +167,30 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    scrollbar-color: white #e5e7eb;
+    scrollbar-width: thin;
   }
+
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: #e5e7eb;
+    border-radius: 999px;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 999px;
+  }
+
+  *::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
   body {
     @apply bg-background text-foreground overflow-x-hidden;
   }
