@@ -23,8 +23,18 @@ export const useUsageStore = create<UsageState>((set) => ({
 export function useRemainingFreePrompts(): number {
   const user = useAuthStore((s) => s.user);
   if (!user) return FREE_PROMPT_LIMIT;
-  if (user.subscription !== "free") return Number.POSITIVE_INFINITY;
-  return Math.max(0, FREE_PROMPT_LIMIT - user.promptCount);
+
+  const subscription = user.subscription;
+  if (subscription === "free") {
+    return Math.max(0, FREE_PROMPT_LIMIT - user.promptCount);
+  }
+
+  const promptCount24h = user.promptCount24h ?? 0;
+  let dailyLimit = 100;
+  if (subscription === "pro") dailyLimit = 500;
+  else if (subscription === "ultra_pro") dailyLimit = 1500;
+
+  return Math.max(0, dailyLimit - promptCount24h);
 }
 
 export function useIsUnlimitedPlan(): boolean {

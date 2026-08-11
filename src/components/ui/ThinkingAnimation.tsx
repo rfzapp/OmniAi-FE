@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { useTheme } from "next-themes"; // maybe not strictly needed if we enforce #0A0A0A
+import { useTheme } from "@/providers/ThemeProvider"; // maybe not strictly needed if we enforce #0A0A0A
 
 type ModelName = "Luna" | "Sol" | "Terra";
 

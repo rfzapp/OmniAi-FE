@@ -86,11 +86,13 @@ async function rawRequest<T>(path: string, options: HttpClientOptions = {}): Pro
   const { params, skipAuthRefresh, ...init } = options;
   const token = useAuthStore.getState().accessToken;
 
+  const isFormData = init.body instanceof FormData;
+
   const response = await fetch(buildUrl(path, params), {
     ...init,
     credentials: "include",
     headers: {
-      "Content-Type": "application/json",
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...init.headers,
     },
@@ -135,6 +137,8 @@ export const httpClient = {
   get: <T>(path: string, options?: HttpClientOptions) => rawRequest<T>(path, { ...options, method: "GET" }),
   post: <T>(path: string, body?: unknown, options?: HttpClientOptions) =>
     rawRequest<T>(path, { ...options, method: "POST", body: JSON.stringify(body) }),
+  postFormData: <T>(path: string, formData: FormData, options?: HttpClientOptions) =>
+    rawRequest<T>(path, { ...options, method: "POST", body: formData }),
   put: <T>(path: string, body?: unknown, options?: HttpClientOptions) =>
     rawRequest<T>(path, { ...options, method: "PUT", body: JSON.stringify(body) }),
   patch: <T>(path: string, body?: unknown, options?: HttpClientOptions) =>

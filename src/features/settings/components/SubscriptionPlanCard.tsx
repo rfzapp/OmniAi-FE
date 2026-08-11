@@ -7,7 +7,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { useUsageStore } from "@/store/useUsageStore";
 
 interface PlanOption {
-  key: "free" | "pro" | "enterprise";
+  key: "free" | "standard" | "pro" | "ultra_pro";
   name: string;
   price: string;
   features: string[];
@@ -15,30 +15,36 @@ interface PlanOption {
 }
 
 const PLANS: PlanOption[] = [
-  { key: "free", name: "Free", price: "$0/mo", features: ["Standard models", "3 messages total"] },
+  { key: "free", name: "Free", price: "$0/mo", features: ["Standard models", "3 messages total", "No file attachments"] },
   {
-    key: "pro",
-    name: "Pro",
-    price: "$20/mo",
-    features: ["All models", "Priority speed", "Unlimited messages"],
+    key: "standard",
+    name: "Standard",
+    price: "$25/mo",
+    features: ["All models", "100 prompts daily", "Limit to 3 file attachments daily"],
     highlighted: true,
   },
   {
-    key: "enterprise",
-    name: "Team",
-    price: "$30/mo per seat",
-    features: ["Everything in Pro", "Shared workspace", "Admin controls"],
+    key: "pro",
+    name: "Pro",
+    price: "$100/mo",
+    features: ["Everything in Standard", "500 prompts daily", "Limit to 15 file attachments daily"],
+  },
+  {
+    key: "ultra_pro",
+    name: "Ultra Pro",
+    price: "$200/mo",
+    features: ["Everything in Pro", "1500 prompts daily", "Limit to 45 file attachments daily"],
   },
 ];
 
-const PLAN_ORDER: PlanOption["key"][] = ["free", "pro", "enterprise"];
+const PLAN_ORDER: PlanOption["key"][] = ["free", "standard", "pro", "ultra_pro"];
 
 export function SubscriptionPlanCard() {
   const currentPlan = useAuthStore((s) => s.user?.subscription) as PlanOption["key"] | undefined;
   const openUpgradeModal = useUsageStore((s) => s.openUpgradeModal);
 
   return (
-    <div className="grid gap-3 px-4 py-4 sm:grid-cols-3">
+    <div className="grid gap-3 px-4 py-4 sm:grid-cols-2 lg:grid-cols-4">
       {PLANS.map((plan) => {
         const isCurrent = plan.key === currentPlan;
         const isDowngrade = currentPlan ? PLAN_ORDER.indexOf(plan.key) < PLAN_ORDER.indexOf(currentPlan) : false;
@@ -47,8 +53,12 @@ export function SubscriptionPlanCard() {
           <div
             key={plan.key}
             className={cn(
-              "flex flex-col gap-3 rounded-xl border p-4",
-              plan.highlighted ? "border-[#0d0d0d] bg-[#0d0d0d]/5" : "border-border"
+              "flex flex-col gap-3 rounded-xl p-4",
+              plan.key === "ultra_pro"
+                ? "relative rainbow-border-card bg-card"
+                : plan.highlighted
+                  ? "border border-[#0d0d0d] bg-[#0d0d0d]/5"
+                  : "border border-border"
             )}
           >
             <div>

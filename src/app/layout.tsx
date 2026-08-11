@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@/providers/ThemeProvider";
 import { AppProviders } from "@/providers/AppProviders";
 import { siteConfig } from "@/config/site";
 
@@ -31,10 +32,13 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="h-full" suppressHydrationWarning>
-        <div suppressHydrationWarning>
-          <AppProviders>{children}</AppProviders>
-        </div>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+          <div suppressHydrationWarning>
+            <AppProviders>{children}</AppProviders>
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );
 }
+

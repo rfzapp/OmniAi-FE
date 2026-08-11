@@ -18,6 +18,13 @@ export function TopBar() {
   const isUnlimited = useIsUnlimitedPlan();
   const openUpgradeModal = useUsageStore((s) => s.openUpgradeModal);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const subscription = useAuthStore((s) => s.user?.subscription ?? "free");
+
+  const planLabel =
+    subscription === "ultra_pro" ? `Ultra Pro — ${remaining} left`
+    : subscription === "pro" ? `Pro — ${remaining} left`
+    : subscription === "standard" ? `Standard — ${remaining} left`
+    : null;
 
   return (
     <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between gap-2 bg-transparent px-3 backdrop-blur-sm sm:px-5">
@@ -30,12 +37,17 @@ export function TopBar() {
       <div className="hidden md:block" />
 
       <div className="flex items-center gap-1.5 sm:gap-2.5">
-        {isUnlimited ? (
-          <span className="hidden items-center gap-1.5 rounded-full border border-border bg-muted px-3 py-1.5 text-xs font-medium text-foreground sm:flex">
+        {isUnlimited && planLabel ? (
+          <button
+            suppressHydrationWarning
+            type="button"
+            onClick={openUpgradeModal}
+            className="hidden items-center gap-1.5 rounded-full border border-border bg-muted px-3 py-1.5 text-xs font-medium text-foreground sm:flex hover:border-foreground/30"
+          >
             <Zap className="size-3.5 text-foreground" />
-            Pro — Unlimited
-          </span>
-        ) : (
+            {planLabel}
+          </button>
+        ) : !isUnlimited ? (
           <>
             <button
               suppressHydrationWarning
@@ -55,7 +67,8 @@ export function TopBar() {
               Upgrade
             </Button>
           </>
-        )}
+        ) : null}
+
         <Link
           href={ROUTES.settings}
           aria-label="Settings"

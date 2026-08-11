@@ -32,10 +32,22 @@ export function MessageBubble({
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.25 }}
-        className="flex justify-end px-4 py-2"
+        className="group/message flex justify-end px-4 py-2"
       >
-        <div className="max-w-[85%] rounded-[24px] bg-[#F4F4F4] hover:bg-[#ECECEC] px-5 py-3 text-sm text-[#0D0D0D] transition-colors md:max-w-[70%] md:text-[15px]">
-          <p className="whitespace-pre-wrap break-words">{message.content}</p>
+        <div className="flex max-w-[85%] flex-col items-end md:max-w-[70%]">
+          <div className="flex w-full flex-col gap-2 rounded-[24px] bg-[#F4F4F4] hover:bg-[#ECECEC] px-5 py-3 text-sm text-[#0D0D0D] transition-colors md:text-[15px]">
+            {message.imageUrl && (
+              <img
+                src={message.imageUrl}
+                alt="Attached image"
+                className="max-h-64 max-w-full rounded-xl object-scale-down shadow-sm"
+              />
+            )}
+            <p className="whitespace-pre-wrap break-words">{message.content}</p>
+          </div>
+          <div className="mt-1 opacity-0 transition-opacity group-hover/message:opacity-100 pr-2">
+            <MessageActionsBar message={message} />
+          </div>
         </div>
       </motion.div>
     );
@@ -69,7 +81,7 @@ export function MessageBubble({
         ) : (
           <MessageMarkdown content={message.content} />
         )}
-        {!showTyping && (
+        {!isStreaming && (
           <div className="mt-2 opacity-0 transition-opacity group-hover/message:opacity-100 md:opacity-100">
             <MessageActionsBar
               message={message}

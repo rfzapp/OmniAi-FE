@@ -13,6 +13,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { isModelAvailable, getModelName } from "@/config/models.config";
 import { ROUTES } from "@/constants/routes";
 import { getApiErrorMessage } from "@/services/httpClient";
+import type { Attachment } from "@/features/prompt/types";
 
 export function NewChatHome() {
   const router = useRouter();
@@ -33,7 +34,7 @@ export function NewChatHome() {
     return "Luna";
   }
 
-  async function handleSend(content: string) {
+  async function handleSend(content: string, attachments?: Attachment[]) {
     const activeModelIdForRequest = getEffectiveModelId();
     if (!isAuthenticated) {
       setError("Please log in to start chatting.");
@@ -55,9 +56,12 @@ export function NewChatHome() {
     setIsSending(true);
 
     try {
-      const chatId = await sendMessage(content, activeModelIdForRequest);
+      const chatId = await sendMessage(content, activeModelIdForRequest, undefined, attachments);
       router.push(ROUTES.chat(chatId));
+      // Don't reset isSending on success — we're navigating away and
+      // resetting would flash the empty state before the new route loads.
     } catch (err) {
+      setIsSending(false);
       if (isLimitReachedError(err)) {
         openUpgradeModal();
       } else if (isModelUnavailableError(err)) {
@@ -65,8 +69,6 @@ export function NewChatHome() {
       } else {
         setError(getApiErrorMessage(err));
       }
-    } finally {
-      setIsSending(false);
     }
   }
 
