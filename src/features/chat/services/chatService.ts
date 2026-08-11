@@ -44,6 +44,15 @@ export interface SendChatMessageParams {
   model: string;
   message: string;
   conversationId?: string;
+  attachments?: Attachment[];
+}
+
+interface Attachment {
+  id: string;
+  name: string;
+  size: number;
+  type?: string;
+  file?: File;
 }
 
 export interface ChatUsage {
@@ -69,6 +78,28 @@ export const chatService = {
   },
 
   sendChatMessage: async (params: SendChatMessageParams): Promise<SendChatMessageResult> => {
+    const hasAttachments = Boolean(params.attachments?.length);
+
+    if (hasAttachments) {
+      const formData = new FormData();
+      formData.append("model", params.model);
+      formData.append("message", params.message);
+      if (params.conversationId) formData.append("conversationId", params.conversationId);
+
+      params.attachments?.forEach((attachment) => {
+        if (attachment.file) {
+          formData.append("attachments", attachment.file, attachment.name);
+        }
+      });
+
+      const data = await httpClient.postFormData<{ conversation: BackendConversation; message: BackendMessage; usage: ChatUsage }>(
+        "/ai/chat",
+        formData,
+      );
+      const conversation = toChat(data.conversation);
+      return { conversation, message: toMessage(data.message, conversation.id), usage: data.usage };
+    }
+
     const data = await httpClient.post<{ conversation: BackendConversation; message: BackendMessage; usage: ChatUsage }>(
       "/ai/chat",
       params,

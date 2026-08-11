@@ -54,10 +54,10 @@ export function ImagePlanCard() {
           <div
             key={plan.key}
             className={cn(
-              "flex flex-col gap-3 rounded-xl border p-4",
-              plan.highlighted
-                ? "border-[#0d0d0d] bg-[#0d0d0d]/5"
-                : "border-border",
+              "flex flex-col gap-3 rounded-xl p-4",
+              plan.key === "pro"
+                ? "relative violet-border-card bg-card"
+                : "border border-border",
             )}
           >
             <div>

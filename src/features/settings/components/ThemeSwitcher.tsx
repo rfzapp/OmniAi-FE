@@ -1,7 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { useTheme } from "next-themes";
+import { useTheme } from "@/providers/ThemeProvider";
 import { Monitor, Moon, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -14,7 +14,7 @@ const OPTIONS = [
 ] as const;
 
 function noopSubscribe() {
-  return () => {};
+  return () => { };
 }
 
 export function ThemeSwitcher() {
@@ -31,7 +31,7 @@ export function ThemeSwitcher() {
     // persisting for signed-in users — best-effort, theme switching
     // shouldn't be blocked or reverted by a failed network call.
     if (useAuthStore.getState().isAuthenticated && (value === "light" || value === "dark")) {
-      settingsService.updatePreferences({ theme: value }).catch(() => {});
+      settingsService.updatePreferences({ theme: value }).catch(() => { });
     }
   }
 

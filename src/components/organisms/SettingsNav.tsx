@@ -29,7 +29,7 @@ export function SettingsNav() {
         })}
       </nav>
 
-      <nav className="no-scrollbar sticky top-0 z-10 -mx-4 flex gap-1 overflow-x-auto border-b border-border bg-background px-4 pb-2 md:hidden">
+      <nav className="no-scrollbar sticky top-0 z-10 -mx-4 flex w-[calc(100%+2rem)] flex-wrap items-center gap-1 border-b border-border bg-background px-4 pb-2 md:hidden">
         {SETTINGS_NAV.map((item) => {
           const active = pathname === item.href;
           return (

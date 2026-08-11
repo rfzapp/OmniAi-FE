@@ -4,8 +4,42 @@ import { useCallback, useState, type KeyboardEvent } from "react";
 import type { Attachment } from "../types";
 
 interface UseComposerSubmitOptions {
-  onSend: (content: string) => void | Promise<void>;
+  onSend: (content: string, attachments?: Attachment[]) => void | Promise<void>;
   disabled?: boolean;
+}
+
+const MAX_ATTACHMENT_SIZE_BYTES = 3 * 1024 * 1024;
+const ALLOWED_MIME_TYPES = new Set([
+  "image/png",
+  "image/jpeg",
+  "image/webp",
+  "image/gif",
+  "application/pdf",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/msword",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+]);
+
+function normalizeFile(file: File): Attachment | null {
+  const mime = file.type || "application/octet-stream";
+  const lower = file.name.toLowerCase();
+  const isPdf = lower.endsWith(".pdf") || mime === "application/pdf";
+  const isWord = lower.endsWith(".doc") || lower.endsWith(".docx") || mime === "application/msword" || mime === "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+  const isExcel = lower.endsWith(".xls") || lower.endsWith(".xlsx") || mime === "application/vnd.ms-excel" || mime === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+  const isImage = mime.startsWith("image/");
+
+  if (!isImage && !isPdf && !isWord && !isExcel) return null;
+  if (!ALLOWED_MIME_TYPES.has(mime) && !(isPdf || isWord || isExcel || isImage)) return null;
+  if (file.size > MAX_ATTACHMENT_SIZE_BYTES) return null;
+
+  return {
+    id: `${file.name}-${file.size}-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    name: file.name,
+    size: file.size,
+    type: mime,
+    file,
+  };
 }
 
 export function useComposerSubmit({ onSend, disabled }: UseComposerSubmitOptions) {
@@ -14,11 +48,12 @@ export function useComposerSubmit({ onSend, disabled }: UseComposerSubmitOptions
 
   const submit = useCallback(() => {
     const trimmed = value.trim();
-    if (!trimmed || disabled) return;
-    void onSend(trimmed);
+    const hasAttachments = attachments.length > 0;
+    if ((!trimmed && !hasAttachments) || disabled) return;
+    void onSend(trimmed, attachments);
     setValue("");
     setAttachments([]);
-  }, [value, disabled, onSend]);
+  }, [value, attachments, disabled, onSend]);
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -32,14 +67,12 @@ export function useComposerSubmit({ onSend, disabled }: UseComposerSubmitOptions
 
   const addAttachment = useCallback((files: FileList | null) => {
     if (!files) return;
-    setAttachments((prev) => [
-      ...prev,
-      ...Array.from(files).map((file) => ({
-        id: `${file.name}-${file.size}-${Date.now()}`,
-        name: file.name,
-        size: file.size,
-      })),
-    ]);
+
+    const next = Array.from(files)
+      .map((file) => normalizeFile(file))
+      .filter((file): file is Attachment => Boolean(file));
+
+    setAttachments((prev) => [...prev, ...next]);
   }, []);
 
   const removeAttachment = useCallback((id: string) => {

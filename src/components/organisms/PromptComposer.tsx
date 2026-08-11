@@ -10,12 +10,20 @@ import { useAutoGrowTextarea } from "@/features/prompt/hooks/useAutoGrowTextarea
 import { cn } from "@/lib/utils";
 
 interface PromptComposerProps {
-  onSend: (content: string) => void | Promise<void>;
+  onSend: (content: string, attachments?: Attachment[]) => void | Promise<void>;
   onStop?: () => void;
   isStreaming?: boolean;
   disabled?: boolean;
   placeholder?: string;
   className?: string;
+}
+
+interface Attachment {
+  id: string;
+  name: string;
+  size: number;
+  type?: string;
+  file?: File;
 }
 
 export function PromptComposer({
@@ -52,16 +60,16 @@ export function PromptComposer({
     <div
       className={cn(
         "rainbow-border w-full rounded-2xl bg-card shadow-sm",
-        className
       )}
     >
       <AttachmentPreview attachments={attachments} onRemove={removeAttachment} />
 
-      <div className="flex items-end gap-1 px-2 py-1.5">
+      <div className="flex items-end gap-1 px-2 py-0.5">
         <input
           ref={fileInputRef}
           type="file"
           multiple
+          accept="image/png,image/jpeg,image/webp,image/gif,application/pdf,.doc,.docx,.xls,.xlsx"
           className="hidden"
           onChange={(e) => {
             addAttachment(e.target.files);
@@ -101,7 +109,7 @@ export function PromptComposer({
           <button
             type="button"
             onClick={submit}
-            disabled={disabled || !value.trim()}
+            disabled={disabled || (!value.trim() && attachments.length === 0)}
             aria-label="Send message"
             className="mb-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-[#0d0d0d] text-white transition-transform enabled:hover:scale-105 enabled:hover:bg-[#2a2a2a] disabled:opacity-30"
           >

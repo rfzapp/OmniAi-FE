@@ -55,7 +55,7 @@ export function ChatThread({ chatId }: { chatId: string }) {
           disabled={isStreaming}
           isStreaming={isStreaming}
           onStop={stopStreaming}
-          onSend={async (content) => {
+          onSend={async (content, attachments) => {
             if (!isAuthenticated) return;
             // Not pre-disabling on limitReached: a disabled composer can't
             // be clicked at all, so this check (and the modal it opens)
@@ -64,7 +64,7 @@ export function ChatThread({ chatId }: { chatId: string }) {
               openUpgradeModal();
               return;
             }
-            await sendMessage(content, getEffectiveModelId(), chatId);
+            await sendMessage(content, getEffectiveModelId(), chatId, attachments);
           }}
         />
       }

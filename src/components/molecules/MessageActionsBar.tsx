@@ -1,6 +1,6 @@
 "use client";
 
-import { RotateCcw, Share2, ThumbsDown, ThumbsUp } from "lucide-react";
+import { RotateCcw, Share2, ThumbsDown, ThumbsUp, Edit2 } from "lucide-react";
 import { IconButton } from "@/components/atoms/IconButton";
 import { CopyButton } from "./CopyButton";
 import { ModelBadge } from "./ModelBadge";
@@ -10,6 +10,7 @@ import type { Message } from "@/features/chat/types";
 interface MessageActionsBarProps {
   message: Message;
   onRegenerate?: () => void;
+  onEdit?: () => void;
   onToggleLike?: () => void;
   onToggleDislike?: () => void;
   onShare?: () => void;
@@ -18,6 +19,7 @@ interface MessageActionsBarProps {
 export function MessageActionsBar({
   message,
   onRegenerate,
+  onEdit,
   onToggleLike,
   onToggleDislike,
   onShare,
@@ -25,6 +27,11 @@ export function MessageActionsBar({
   return (
     <div className="flex flex-wrap items-center gap-0.5 text-muted-foreground">
       <CopyButton text={message.content} label="Copy" />
+      {onEdit && (
+        <IconButton label="Edit" onClick={onEdit}>
+          <Edit2 className="size-3.5" />
+        </IconButton>
+      )}
       {onRegenerate && (
         <IconButton label="Regenerate" onClick={onRegenerate}>
           <RotateCcw className="size-3.5" />

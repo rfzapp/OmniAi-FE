@@ -3,11 +3,19 @@ import { PromptComposer } from "./PromptComposer";
 import { cn } from "@/lib/utils";
 
 interface ComposerBarProps {
-  onSend: (content: string) => void | Promise<void>;
+  onSend: (content: string, attachments?: Attachment[]) => void | Promise<void>;
   onStop?: () => void;
   isStreaming?: boolean;
   disabled?: boolean;
   className?: string;
+}
+
+interface Attachment {
+  id: string;
+  name: string;
+  size: number;
+  type?: string;
+  file?: File;
 }
 
 export function ComposerBar({ onSend, onStop, isStreaming, disabled, className }: ComposerBarProps) {

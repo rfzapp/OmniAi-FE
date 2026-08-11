@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
-import { useTheme } from "next-themes";
+import { useTheme } from "@/providers/ThemeProvider";
 import { settingsService } from "../services/settingsService";
 import { useModelStore } from "@/store/useModelStore";
 import { useSettingsStore } from "@/store/useSettingsStore";

@@ -13,6 +13,9 @@ export interface AuthUser {
   subscription: string;
   imagePlan: "none" | "basic" | "pro";
   promptCount: number;
+  promptCount24h?: number;
+  attachmentCount24h?: number;
+  lastPromptResetAt?: string;
 }
 
 interface AuthState {

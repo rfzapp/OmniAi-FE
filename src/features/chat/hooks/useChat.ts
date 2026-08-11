@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import type { Attachment } from "@/features/prompt/types";
 import { useChatStore } from "@/store/useChatStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useUsageStore } from "@/store/useUsageStore";
@@ -17,7 +18,7 @@ export function isLimitReachedError(err: unknown): boolean {
   return err instanceof ApiError && err.status === 403 && !err.message.toLowerCase().includes("image");
 }
 
-export class ModelUnavailableError extends Error {}
+export class ModelUnavailableError extends Error { }
 
 export function isModelUnavailableError(err: unknown): err is ModelUnavailableError {
   return err instanceof ModelUnavailableError;
@@ -119,7 +120,7 @@ export function useChat(chatId?: string) {
   }, [streaming, setStreamingMessageId]);
 
   const sendMessage = useCallback(
-    async (content: string, modelId: string, rawTargetChatId?: string): Promise<string> => {
+    async (content: string, modelId: string, rawTargetChatId?: string, attachments?: Attachment[]): Promise<string> => {
       const targetChatId = isValidChatId(rawTargetChatId) ? rawTargetChatId : undefined;
       const assistantMessageId = createId();
       const apiModel = resolveApiModel(modelId);
@@ -132,9 +133,9 @@ export function useChat(chatId?: string) {
       }
 
       // Existing chat: we already have a stable id, so show the user's
-      // message and a "thinking" placeholder immediately.
       if (targetChatId) {
-        addMessage({ id: createId(), chatId: targetChatId, role: "user", content, createdAt: new Date().toISOString() });
+        const optimisticImageUrl = attachments?.[0]?.file ? URL.createObjectURL(attachments[0].file) : undefined;
+        addMessage({ id: createId(), chatId: targetChatId, role: "user", content, createdAt: new Date().toISOString(), imageUrl: optimisticImageUrl });
 
         if (!isModelAvailable(modelId)) {
           // Only OpenAI is actually wired up on the backend — don't spend a
@@ -167,6 +168,7 @@ export function useChat(chatId?: string) {
           model: apiModel,
           message: content,
           conversationId: targetChatId,
+          attachments,
         });
         useAuthStore.getState().setPromptCount(result.usage.promptsUsed);
       } catch (err) {
@@ -207,7 +209,8 @@ export function useChat(chatId?: string) {
       // New chat: we only know the real id now, so add both messages at once.
       if (!targetChatId) {
         upsertChat(result.conversation);
-        addMessage({ id: createId(), chatId: activeChatId, role: "user", content, createdAt: new Date().toISOString() });
+        const optimisticImageUrl = attachments?.[0]?.file ? URL.createObjectURL(attachments[0].file) : undefined;
+        addMessage({ id: createId(), chatId: activeChatId, role: "user", content, createdAt: new Date().toISOString(), imageUrl: optimisticImageUrl });
         addMessage({
           id: assistantMessageId,
           chatId: activeChatId,
