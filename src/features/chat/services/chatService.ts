@@ -57,6 +57,7 @@ interface Attachment {
 
 export interface ChatUsage {
   promptsUsed: number;
+  promptsUsed24h?: number;
   promptsLimit: number | null;
 }
 
@@ -110,6 +111,19 @@ export const chatService = {
 
   deleteChat: async (id: string): Promise<void> => {
     await httpClient.delete(`/conversations/${id}`);
+  },
+
+  shareChat: async (id: string): Promise<string> => {
+    const data = await httpClient.post<{ shareToken: string }>(`/conversations/${id}/share`);
+    return data.shareToken;
+  },
+
+  unshareChat: async (id: string): Promise<void> => {
+    await httpClient.delete(`/conversations/${id}/share`);
+  },
+
+  getSharedChat: async (token: string): Promise<{ conversation: { id: string; title: string }; messages: BackendMessage[] }> => {
+    return httpClient.get(`/conversations/shared/${token}`);
   },
 
   // Renaming isn't backed by the API yet — local-only for now.

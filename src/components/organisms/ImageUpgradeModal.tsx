@@ -14,7 +14,7 @@ import { useGoToSubscription } from "@/features/settings/hooks/useGoToSubscripti
 import { cn } from "@/lib/utils";
 
 interface ImagePlanOption {
-  key: "basic" | "pro";
+  key: "basic" | "pro" | "ultra_pro";
   name: string;
   price: string;
   features: string[];
@@ -25,15 +25,21 @@ const IMAGE_PLANS: ImagePlanOption[] = [
   {
     key: "basic",
     name: "Basic",
-    price: "$20/mo",
-    features: ["50 images / month", "1024×1024 resolution", "Standard quality"],
+    price: "$50/mo",
+    features: ["3 images / day", "All AI models", "1024×1024 resolution"],
   },
   {
     key: "pro",
     name: "Pro",
-    price: "$60/mo",
-    features: ["Unlimited images", "1024×1024 resolution", "Standard quality", "Priority generation"],
+    price: "$150/mo",
+    features: ["10 images / day", "All AI models", "1024×1024 resolution", "Priority generation"],
     highlighted: true,
+  },
+  {
+    key: "ultra_pro",
+    name: "Ultra Pro",
+    price: "$250/mo",
+    features: ["15 images / day", "All AI models", "1024×1024 resolution", "Priority generation", "Highest quality"],
   },
 ];
 
@@ -44,24 +50,26 @@ export function ImageUpgradeModal() {
 
   return (
     <Dialog open={open} onOpenChange={(next) => !next && closeImageUpgradeModal()}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-lg">
         <DialogHeader className="items-center text-center">
           <div className="flex size-12 items-center justify-center rounded-2xl bg-muted text-foreground">
             <ImageIcon className="size-6" />
           </div>
           <DialogTitle className="mt-2 text-xl">Unlock Image Generation</DialogTitle>
           <DialogDescription className="text-center">
-            Image generation is a separate add-on — available even on the free chat plan.
+            Separate add-on — works with GPT, Claude, and all other models.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="mt-2 grid grid-cols-2 gap-3">
+        <div className="mt-2 grid grid-cols-3 gap-3">
           {IMAGE_PLANS.map((plan) => (
             <div
               key={plan.key}
               className={cn(
                 "relative flex flex-col gap-3 rounded-xl border p-4",
-                plan.highlighted
+                plan.key === "ultra_pro"
+                  ? "rainbow-border"
+                  : plan.highlighted
                   ? "border-[#0d0d0d] bg-[#0d0d0d]/5"
                   : "border-border bg-card",
               )}

@@ -170,7 +170,7 @@ export function useChat(chatId?: string) {
           conversationId: targetChatId,
           attachments,
         });
-        useAuthStore.getState().setPromptCount(result.usage.promptsUsed);
+        useAuthStore.getState().setPromptCount(result.usage.promptsUsed, result.usage.promptsUsed24h);
       } catch (err) {
         setStreamingMessageId(null);
         if (targetChatId) {
@@ -264,7 +264,7 @@ export function useChat(chatId?: string) {
           message: lastUserMessage.content,
           conversationId: targetChatId,
         });
-        useAuthStore.getState().setPromptCount(result.usage.promptsUsed);
+        useAuthStore.getState().setPromptCount(result.usage.promptsUsed, result.usage.promptsUsed24h);
         streaming.start(
           result.message.content,
           (partial) => updateMessage(targetChatId, messageId, { content: partial }),
