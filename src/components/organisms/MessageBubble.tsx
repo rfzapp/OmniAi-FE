@@ -5,6 +5,7 @@ import { LogoMark } from "@/components/atoms/Logo";
 import { MessageMarkdown } from "@/features/chat/components/MessageMarkdown";
 import { MessageActionsBar } from "@/components/molecules/MessageActionsBar";
 import { ThinkingAnimation } from "@/components/ui/ThinkingAnimation";
+import { getModelName } from "@/config/models.config";
 import type { Message } from "@/features/chat/types";
 
 interface MessageBubbleProps {
@@ -14,6 +15,15 @@ interface MessageBubbleProps {
   onToggleLike?: () => void;
   onToggleDislike?: () => void;
   onShare?: () => void;
+}
+
+function resolveThinkingModel(modelId?: string): "Luna" | "Sol" | "Terra" | "Claude" {
+  if (!modelId) return "Luna";
+  if (modelId === "gpt-5.6-sol" || modelId === "gpt-omni") return "Sol";
+  if (modelId === "gpt-5.6-terra") return "Terra";
+  if (modelId === "gpt-5.6-luna") return "Luna";
+  if (modelId === "claude-omni" || modelId.startsWith("claude-")) return "Claude";
+  return "Luna";
 }
 
 export function MessageBubble({
@@ -68,7 +78,10 @@ export function MessageBubble({
       <div className="min-w-0 flex-1 text-[#0D0D0D] md:text-[15px]">
         {showTyping ? (
           <div className="w-[560px] max-w-[min(560px,90vw)] min-w-[280px] rounded-2xl border border-border bg-white p-4 shadow-sm">
-            <ThinkingAnimation model={(message.modelId as "Luna" | "Sol" | "Terra") || "Luna"} />
+            <ThinkingAnimation
+              model={resolveThinkingModel(message.modelId)}
+              modelLabel={message.modelId ? getModelName(message.modelId) : undefined}
+            />
           </div>
         ) : message.imageUrl ? (
           <div className="flex flex-col gap-3">

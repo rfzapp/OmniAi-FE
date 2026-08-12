@@ -28,13 +28,14 @@ export function NewChatHome() {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
-  function resolveThinkingModel(modelId?: string): "Luna" | "Sol" | "Terra" {
-    if (modelId === "gpt-5.6-sol") return "Sol";
+  function resolveThinkingModel(modelId?: string): "Luna" | "Sol" | "Terra" | "Claude" {
+    if (!modelId) return "Luna";
+    if (modelId === "gpt-5.6-sol" || modelId === "gpt-omni") return "Sol";
     if (modelId === "gpt-5.6-terra") return "Terra";
+    if (modelId === "gpt-5.6-luna") return "Luna";
+    if (modelId === "claude-omni" || modelId.startsWith("claude-")) return "Claude";
     return "Luna";
-  }
-
-  async function handleSend(content: string, attachments?: Attachment[]) {
+  }  async function handleSend(content: string, attachments?: Attachment[]) {
     const activeModelIdForRequest = getEffectiveModelId();
     if (!isAuthenticated) {
       setError("Please log in to start chatting.");
@@ -85,7 +86,10 @@ export function NewChatHome() {
               </div>
 
               <div className="w-full rounded-2xl border border-border bg-white p-4 shadow-sm">
-                <ThinkingAnimation model={resolveThinkingModel(activeModelId)} />
+                <ThinkingAnimation
+                  model={resolveThinkingModel(activeModelId)}
+                  modelLabel={activeModelId ? getModelName(activeModelId) : undefined}
+                />
               </div>
             </div>
           </div>

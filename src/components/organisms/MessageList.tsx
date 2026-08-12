@@ -10,6 +10,7 @@ interface MessageListProps {
   onRegenerate?: (messageId: string) => void;
   onToggleLike?: (messageId: string) => void;
   onToggleDislike?: (messageId: string) => void;
+  onShare?: () => void;
 }
 
 export function MessageList({
@@ -18,8 +19,9 @@ export function MessageList({
   onRegenerate,
   onToggleLike,
   onToggleDislike,
+  onShare,
 }: MessageListProps) {
-  const bottomRef = useAutoScroll(messages.length + (streamingMessageId ? 1 : 0));
+  const bottomRef = useAutoScroll([messages.length, streamingMessageId, messages[messages.length - 1]?.content]);
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col py-4">
@@ -37,7 +39,7 @@ export function MessageList({
           onToggleDislike={
             message.role === "assistant" ? () => onToggleDislike?.(message.id) : undefined
           }
-          onShare={message.role === "assistant" ? () => undefined : undefined}
+          onShare={message.role === "assistant" ? onShare : undefined}
         />
       ))}
       <div ref={bottomRef} />

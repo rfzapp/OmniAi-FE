@@ -11,7 +11,7 @@ export interface AuthUser {
   avatar: string;
   role: string;
   subscription: string;
-  imagePlan: "none" | "basic" | "pro";
+  imagePlan: "none" | "basic" | "pro" | "ultra_pro";
   promptCount: number;
   promptCount24h?: number;
   attachmentCount24h?: number;
@@ -34,7 +34,7 @@ interface AuthState {
   setSession: (user: AuthUser, accessToken: string, refreshToken?: string) => void;
   setUser: (user: AuthUser) => void;
   setAccessToken: (accessToken: string, refreshToken?: string) => void;
-  setPromptCount: (promptCount: number) => void;
+  setPromptCount: (promptCount: number, promptCount24h?: number) => void;
   clearSession: () => void;
 }
 
@@ -57,8 +57,8 @@ export const useAuthStore = create<AuthState>()(
           accessToken,
           ...(refreshToken ? { refreshToken } : {}),
         })),
-      setPromptCount: (promptCount) =>
-        set((state) => (state.user ? { user: { ...state.user, promptCount } } : state)),
+      setPromptCount: (promptCount, promptCount24h) =>
+        set((state) => (state.user ? { user: { ...state.user, promptCount, ...(promptCount24h !== undefined && { promptCount24h }) } } : state)),
       clearSession: () => {
         set({ user: null, accessToken: null, refreshToken: null, isAuthenticated: false });
         useChatStore.getState().reset();

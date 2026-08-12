@@ -6,8 +6,10 @@ import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useUsageStore } from "@/store/useUsageStore";
 
+type ImagePlanKey = "none" | "basic" | "pro" | "ultra_pro";
+
 interface ImagePlanOption {
-  key: "none" | "basic" | "pro";
+  key: ImagePlanKey;
   name: string;
   price: string;
   features: string[];
@@ -24,39 +26,45 @@ const IMAGE_PLANS: ImagePlanOption[] = [
   {
     key: "basic",
     name: "Basic",
-    price: "$20/mo",
-    features: ["50 images / month", "1024×1024 resolution", "Standard quality"],
-    highlighted: false,
+    price: "$50/mo",
+    features: ["3 images / day", "All AI models", "1024×1024 resolution"],
   },
   {
     key: "pro",
     name: "Pro",
-    price: "$60/mo",
-    features: ["Unlimited images", "1024×1024 resolution", "Standard quality", "Priority generation"],
+    price: "$150/mo",
+    features: ["10 images / day", "All AI models", "1024×1024 resolution", "Priority generation"],
     highlighted: true,
+  },
+  {
+    key: "ultra_pro",
+    name: "Ultra Pro",
+    price: "$250/mo",
+    features: ["15 images / day", "All AI models", "1024×1024 resolution", "Priority generation", "Highest quality"],
   },
 ];
 
-const PLAN_ORDER: ImagePlanOption["key"][] = ["none", "basic", "pro"];
+const PLAN_ORDER: ImagePlanKey[] = ["none", "basic", "pro", "ultra_pro"];
 
 export function ImagePlanCard() {
-  const currentPlan = (useAuthStore((s) => s.user?.imagePlan) ?? "none") as ImagePlanOption["key"];
+  const currentPlan = (useAuthStore((s) => s.user?.imagePlan) ?? "none") as ImagePlanKey;
   const openImageUpgradeModal = useUsageStore((s) => s.openImageUpgradeModal);
 
   return (
-    <div className="grid gap-3 px-4 py-4 sm:grid-cols-3">
+    <div className="grid gap-3 px-4 py-4 sm:grid-cols-4">
       {IMAGE_PLANS.map((plan) => {
         const isCurrent = plan.key === currentPlan;
-        const isDowngrade =
-          PLAN_ORDER.indexOf(plan.key) < PLAN_ORDER.indexOf(currentPlan);
+        const isDowngrade = PLAN_ORDER.indexOf(plan.key) < PLAN_ORDER.indexOf(currentPlan);
 
         return (
           <div
             key={plan.key}
             className={cn(
-              "flex flex-col gap-3 rounded-xl p-4",
-              plan.key === "pro"
-                ? "relative violet-border-card bg-card"
+              "flex flex-col gap-3 rounded-xl border p-4 transition-all",
+              plan.key === "ultra_pro"
+                ? "rainbow-border"
+                : isCurrent
+                ? "current-plan-card border bg-card"
                 : "border border-border",
             )}
           >
@@ -66,10 +74,7 @@ export function ImagePlanCard() {
             </div>
             <ul className="flex flex-1 flex-col gap-1.5">
               {plan.features.map((feature) => (
-                <li
-                  key={feature}
-                  className="flex items-start gap-1.5 text-xs text-muted-foreground"
-                >
+                <li key={feature} className="flex items-start gap-1.5 text-xs text-muted-foreground">
                   <Check className="mt-0.5 size-3 shrink-0 text-foreground" />
                   {feature}
                 </li>

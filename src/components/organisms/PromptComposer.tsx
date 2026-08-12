@@ -64,7 +64,7 @@ export function PromptComposer({
     >
       <AttachmentPreview attachments={attachments} onRemove={removeAttachment} />
 
-      <div className="flex items-end gap-1 px-2 py-0.5">
+      <div className="flex items-center gap-1 px-2 py-1">
         <input
           ref={fileInputRef}
           type="file"
@@ -80,7 +80,7 @@ export function PromptComposer({
           label="Attach file"
           onClick={() => fileInputRef.current?.click()}
           disabled={disabled}
-          className="mb-0.5 shrink-0"
+          className="shrink-0"
         >
           <Paperclip className="size-4" />
         </IconButton>
@@ -101,7 +101,7 @@ export function PromptComposer({
             type="button"
             onClick={onStop}
             aria-label="Stop response"
-            className="mb-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-[#0d0d0d] text-white transition-transform hover:scale-105 hover:bg-[#2a2a2a]"
+            className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#0d0d0d] text-white transition-transform hover:scale-105 hover:bg-[#2a2a2a]"
           >
             <Square className="size-3.5 fill-current" />
           </button>
@@ -111,7 +111,7 @@ export function PromptComposer({
             onClick={submit}
             disabled={disabled || (!value.trim() && attachments.length === 0)}
             aria-label="Send message"
-            className="mb-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-[#0d0d0d] text-white transition-transform enabled:hover:scale-105 enabled:hover:bg-[#2a2a2a] disabled:opacity-30"
+            className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#0d0d0d] text-white transition-transform enabled:hover:scale-105 enabled:hover:bg-[#2a2a2a] disabled:opacity-30"
           >
             <ArrowUp className="size-4" />
           </button>

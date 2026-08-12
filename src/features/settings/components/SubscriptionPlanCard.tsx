@@ -53,12 +53,12 @@ export function SubscriptionPlanCard() {
           <div
             key={plan.key}
             className={cn(
-              "flex flex-col gap-3 rounded-xl p-4",
+              "flex flex-col gap-3 rounded-xl border p-4 transition-all",
               plan.key === "ultra_pro"
-                ? "relative rainbow-border-card bg-card"
-                : plan.highlighted
-                  ? "border border-[#0d0d0d] bg-[#0d0d0d]/5"
-                  : "border border-border"
+                ? "rainbow-border-card bg-card"
+                : isCurrent
+                ? "current-plan-card border bg-card"
+                : "border border-border"
             )}
           >
             <div>

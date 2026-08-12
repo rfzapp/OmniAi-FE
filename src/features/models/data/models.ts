@@ -41,6 +41,45 @@ export const GPT_VARIANTS: GptVariant[] = [
   },
 ];
 
+export interface ClaudeVariant {
+  id: string;
+  name: string;
+  description: string;
+  badge?: string;
+  speed: "fast" | "standard" | "slower";
+}
+
+export const CLAUDE_VARIANTS: ClaudeVariant[] = [
+  {
+    id: "claude-haiku-4-5",
+    name: "Claude Haiku 4.5",
+    description: "Fastest and most affordable — high volume everyday tasks",
+    badge: "Haiku",
+    speed: "fast",
+  },
+  {
+    id: "claude-sonnet-5",
+    name: "Claude Sonnet 5",
+    description: "Everyday tasks, writing, and cost-efficient performance",
+    badge: "Sonnet",
+    speed: "standard",
+  },
+  {
+    id: "claude-fable-5",
+    name: "Claude Fable 5",
+    description: "Most capable model — research, multi-day and complex tasks",
+    badge: "Fable",
+    speed: "slower",
+  },
+  {
+    id: "claude-opus-5",
+    name: "Claude Opus 5",
+    description: "Complex projects, coding and agentic workflows",
+    badge: "Opus",
+    speed: "slower",
+  },
+];
+
 export const AI_MODELS: AiModel[] = [
   {
     id: "gpt-omni",
@@ -60,7 +99,7 @@ export const AI_MODELS: AiModel[] = [
     speed: "standard",
     logo: claudeLogo,
     color: "#D97757",
-    available: false,
+    available: true,
   },
   {
     id: "gemini-omni",
