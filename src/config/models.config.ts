@@ -10,7 +10,8 @@ const API_MODEL_MAP: Record<string, string> = {
   "gpt-5.6-sol":        "gpt-5.6-sol",
   "gpt-5.6-terra":      "gpt-5.6-terra",
   "gpt-5.6-luna":       "gpt-5.6-luna",
-  "claude-omni":        "claude-haiku-4-5-20251001",  // default Claude variant
+  "gpt-4.1-mini":       "gpt-5.6-luna",    // legacy fallback
+  "claude-omni":        "claude-haiku-4-5-20251001",
   "claude-haiku-4-5":   "claude-haiku-4-5-20251001",
   "claude-sonnet-5":    "claude-sonnet-5",
   "claude-fable-5":     "claude-fable-5",
