@@ -5,6 +5,7 @@ interface BackendConversation {
   id: string;
   title: string;
   model?: string;
+  isPinned?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -23,6 +24,7 @@ function toChat(conversation: BackendConversation): Chat {
   return {
     id: conversation.id,
     title: conversation.title,
+    isPinned: conversation.isPinned,
     createdAt: conversation.createdAt,
     updatedAt: conversation.updatedAt,
   };
@@ -127,5 +129,9 @@ export const chatService = {
   },
 
   // Renaming isn't backed by the API yet — local-only for now.
-  renameChat: async (_id: string, _title: string): Promise<void> => {},
+  renameChat: async (_id: string, _title: string): Promise<void> => { },
+
+  pinChat: async (id: string, isPinned: boolean): Promise<void> => {
+    await httpClient.patch(`/conversations/${id}/pin`, { isPinned });
+  },
 };

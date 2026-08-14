@@ -17,6 +17,7 @@ export interface Message {
 export interface Chat {
   id: ID;
   title: string;
+  isPinned?: boolean;
   createdAt: string;
   updatedAt: string;
 }

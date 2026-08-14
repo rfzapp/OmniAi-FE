@@ -16,6 +16,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { ROUTES } from "@/constants/routes";
 
 const GROUP_LABELS: Record<string, string> = {
+  Pinned: "Pinned",
   Today: "Today",
   Yesterday: "Yesterday",
   "Previous 7 Days": "Previous 7 Days",
@@ -37,7 +38,7 @@ export function SidebarContent({
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebounce(query, 200);
   const sections = useChatHistory(debouncedQuery);
-  const { deleteChat, renameChat } = useChat();
+  const { deleteChat, renameChat, pinChat } = useChat();
 
   return (
     <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
@@ -107,6 +108,7 @@ export function SidebarContent({
                       chat={chat}
                       onRename={renameChat}
                       onDelete={deleteChat}
+                      onPin={pinChat}
                       onNavigate={onNavigate}
                     />
                   ))}

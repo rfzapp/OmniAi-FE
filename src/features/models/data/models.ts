@@ -65,17 +65,17 @@ export const CLAUDE_VARIANTS: ClaudeVariant[] = [
     speed: "standard",
   },
   {
-    id: "claude-fable-5",
-    name: "Claude Fable 5",
-    description: "Most capable model — research, multi-day and complex tasks",
-    badge: "Fable",
-    speed: "slower",
-  },
-  {
     id: "claude-opus-5",
     name: "Claude Opus 5",
     description: "Complex projects, coding and agentic workflows",
     badge: "Opus",
+    speed: "slower",
+  },
+  {
+    id: "claude-fable-5",
+    name: "Claude Fable 5",
+    description: "Most capable model — research, multi-day and complex tasks",
+    badge: "Fable",
     speed: "slower",
   },
 ];
