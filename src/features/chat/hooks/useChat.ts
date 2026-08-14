@@ -114,6 +114,20 @@ export function useChat(chatId?: string) {
     [upsertChat]
   );
 
+  const pinChat = useCallback(
+    async (id: string, isPinned: boolean) => {
+      const chat = useChatStore.getState().chats.find((c) => c.id === id);
+      if (chat) upsertChat({ ...chat, isPinned });
+      try {
+        await chatService.pinChat(id, isPinned);
+      } catch (err) {
+        console.error("Failed to pin chat:", err);
+        if (chat) upsertChat({ ...chat, isPinned: !isPinned });
+      }
+    },
+    [upsertChat]
+  );
+
   const stopStreaming = useCallback(() => {
     streaming.stop();
     setStreamingMessageId(null);
@@ -317,6 +331,7 @@ export function useChat(chatId?: string) {
     stopStreaming,
     deleteChat,
     renameChat,
+    pinChat,
     toggleReaction,
     regenerateMessage,
   };

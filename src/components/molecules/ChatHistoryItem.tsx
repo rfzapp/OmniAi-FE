@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2, Pin } from "lucide-react";
+import { motion } from "framer-motion";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,10 +21,11 @@ interface ChatHistoryItemProps {
   chat: Chat;
   onRename: (id: string, title: string) => void;
   onDelete: (id: string) => void;
+  onPin: (id: string, isPinned: boolean) => void;
   onNavigate?: () => void;
 }
 
-export function ChatHistoryItem({ chat, onRename, onDelete, onNavigate }: ChatHistoryItemProps) {
+export function ChatHistoryItem({ chat, onRename, onDelete, onPin, onNavigate }: ChatHistoryItemProps) {
   const pathname = usePathname();
   const active = pathname === ROUTES.chat(chat.id);
   const [editing, setEditing] = useState(false);
@@ -56,7 +58,8 @@ export function ChatHistoryItem({ chat, onRename, onDelete, onNavigate }: ChatHi
   }
 
   return (
-    <div
+    <motion.div
+      layout="position"
       className={cn(
         "group/item relative flex items-center rounded-lg text-sm text-sidebar-foreground/80 hover:bg-sidebar-accent",
         active && "bg-sidebar-accent text-sidebar-accent-foreground"
@@ -69,6 +72,9 @@ export function ChatHistoryItem({ chat, onRename, onDelete, onNavigate }: ChatHi
       >
         {chat.title}
       </Link>
+      {chat.isPinned && (
+        <Pin className="mr-1.5 size-3 w-3 shrink-0 text-sidebar-foreground/45 group-hover/item:hidden" />
+      )}
       <DropdownMenu>
         <DropdownMenuTrigger
           render={
@@ -83,6 +89,9 @@ export function ChatHistoryItem({ chat, onRename, onDelete, onNavigate }: ChatHi
           }
         />
         <DropdownMenuContent align="start" side="right">
+          <DropdownMenuItem onClick={() => onPin(chat.id, !chat.isPinned)}>
+            <Pin /> {chat.isPinned ? "Unpin" : "Pin"}
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setEditing(true)}>
             <Pencil /> Rename
           </DropdownMenuItem>
@@ -91,6 +100,6 @@ export function ChatHistoryItem({ chat, onRename, onDelete, onNavigate }: ChatHi
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-    </div>
+    </motion.div>
   );
 }

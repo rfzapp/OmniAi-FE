@@ -1,12 +1,20 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ArrowUp, Paperclip, Square } from "lucide-react";
+import { ArrowUp, Square, Plus, Paperclip, Image, FileText, Camera, Globe } from "lucide-react";
 import { Textarea } from "@/components/atoms/Textarea";
 import { IconButton } from "@/components/atoms/IconButton";
 import { AttachmentPreview } from "@/features/prompt/components/AttachmentPreview";
 import { useComposerSubmit } from "@/features/prompt/hooks/useComposerSubmit";
 import { useAutoGrowTextarea } from "@/features/prompt/hooks/useAutoGrowTextarea";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
 interface PromptComposerProps {
@@ -35,6 +43,7 @@ export function PromptComposer({
   className,
 }: PromptComposerProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
   const { value, setValue, submit, handleKeyDown, attachments, addAttachment, removeAttachment } =
     useComposerSubmit({ onSend, disabled });
   const textareaRef = useAutoGrowTextarea(value);
@@ -52,38 +61,114 @@ export function PromptComposer({
     const intervalId = window.setInterval(() => {
       setActivePlaceholder((current) => (current + 1) % rotatingPlaceholders.length);
     }, 5200);
-
     return () => window.clearInterval(intervalId);
   }, []);
 
+  const menuItems = [
+    {
+      icon: Paperclip,
+      label: "Attach file",
+      description: "PDF, Word, Excel…",
+      onClick: () => fileInputRef.current?.click(),
+    },
+    {
+      icon: Image,
+      label: "Upload image",
+      description: "PNG, JPEG, WEBP, GIF",
+      onClick: () => imageInputRef.current?.click(),
+    },
+    {
+      icon: Camera,
+      label: "Take photo",
+      description: "Use device camera",
+      onClick: () => {
+        /* future: camera capture */
+      },
+    },
+    {
+      icon: Globe,
+      label: "Browse the web",
+      description: "Add a URL as context",
+      onClick: () => {
+        /* future: URL context */
+      },
+    },
+    {
+      icon: FileText,
+      label: "Create document",
+      description: "Start with a template",
+      onClick: () => {
+        /* future: templates */
+      },
+    },
+  ];
+
   return (
-    <div
-      className={cn(
-        "rainbow-border w-full rounded-2xl bg-card shadow-sm",
-      )}
-    >
+    <div className={cn("rainbow-border w-full rounded-2xl bg-card shadow-sm")}>
       <AttachmentPreview attachments={attachments} onRemove={removeAttachment} />
 
+      {/* Hidden file inputs */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        multiple
+        accept="application/pdf,.doc,.docx,.xls,.xlsx"
+        className="hidden"
+        onChange={(e) => {
+          addAttachment(e.target.files);
+          e.target.value = "";
+        }}
+      />
+      <input
+        ref={imageInputRef}
+        type="file"
+        multiple
+        accept="image/png,image/jpeg,image/webp,image/gif"
+        className="hidden"
+        onChange={(e) => {
+          addAttachment(e.target.files);
+          e.target.value = "";
+        }}
+      />
+
       <div className="flex items-center gap-1 px-2 py-1">
-        <input
-          ref={fileInputRef}
-          type="file"
-          multiple
-          accept="image/png,image/jpeg,image/webp,image/gif,application/pdf,.doc,.docx,.xls,.xlsx"
-          className="hidden"
-          onChange={(e) => {
-            addAttachment(e.target.files);
-            e.target.value = "";
-          }}
-        />
-        <IconButton
-          label="Attach file"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={disabled}
-          className="shrink-0"
-        >
-          <Paperclip className="size-4" />
-        </IconButton>
+        {/* + Dropdown trigger */}
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={
+              <IconButton
+                label="Add attachment or action"
+                disabled={disabled}
+                className="shrink-0"
+              >
+                <Plus className="size-4" />
+              </IconButton>
+            }
+          />
+          <DropdownMenuContent side="top" align="start" sideOffset={8} className="w-56">
+            <DropdownMenuLabel className="text-xs font-medium text-muted-foreground pb-1">
+              Add to conversation
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {menuItems.map((item) => (
+              <DropdownMenuItem
+                key={item.label}
+                onClick={item.onClick}
+                className="flex items-start gap-3 py-2"
+              >
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-muted">
+                  <item.icon className="size-3.5 text-foreground/70" />
+                </span>
+                <span className="flex flex-col min-w-0">
+                  <span className="text-sm font-medium leading-tight">{item.label}</span>
+                  <span className="text-[11px] text-muted-foreground leading-tight mt-0.5">
+                    {item.description}
+                  </span>
+                </span>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         <Textarea
           ref={textareaRef}

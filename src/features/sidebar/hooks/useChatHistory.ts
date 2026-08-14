@@ -14,9 +14,22 @@ export function useChatHistory(query = "") {
     const filtered = query.trim()
       ? chats.filter((c) => c.title.toLowerCase().includes(query.trim().toLowerCase()))
       : chats;
-    const grouped = groupByDate<Chat>(filtered, (chat) => new Date(chat.updatedAt));
-    return GROUP_ORDER.map((group) => ({ group, chats: grouped[group] })).filter(
-      (section) => section.chats.length > 0
-    );
+
+    const pinnedChats = filtered.filter((c) => c.isPinned);
+    const unpinnedChats = filtered.filter((c) => !c.isPinned);
+
+    const grouped = groupByDate<Chat>(unpinnedChats, (chat) => new Date(chat.updatedAt));
+    const recentSections = GROUP_ORDER.map((group) => ({
+      group,
+      chats: grouped[group] || [],
+    })).filter((section) => section.chats.length > 0);
+
+    if (pinnedChats.length > 0) {
+      return [
+        { group: "Pinned", chats: pinnedChats },
+        ...recentSections,
+      ];
+    }
+    return recentSections;
   }, [chats, query]);
 }
