@@ -1,21 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MoreHorizontal, Pencil, Trash2, Pin } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2, Pin, FolderInput } from "lucide-react";
 import { motion } from "framer-motion";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/atoms/Button";
 import { Input } from "@/components/atoms/Input";
 import { cn } from "@/lib/utils";
 import type { Chat } from "@/features/chat/types";
 import { ROUTES } from "@/constants/routes";
+import { useFolderStore } from "@/store/useFolderStore";
 
 interface ChatHistoryItemProps {
   chat: Chat;
@@ -23,13 +25,18 @@ interface ChatHistoryItemProps {
   onDelete: (id: string) => void;
   onPin: (id: string, isPinned: boolean) => void;
   onNavigate?: () => void;
+  extraMenuItems?: ReactNode;
 }
 
-export function ChatHistoryItem({ chat, onRename, onDelete, onPin, onNavigate }: ChatHistoryItemProps) {
+export function ChatHistoryItem({ chat, onRename, onDelete, onPin, onNavigate, extraMenuItems }: ChatHistoryItemProps) {
   const pathname = usePathname();
   const active = pathname === ROUTES.chat(chat.id);
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState(chat.title);
+
+  const folders = useFolderStore((s) => s.folders);
+  const addChatToFolder = useFolderStore((s) => s.addChatToFolder);
+  const currentFolder = useFolderStore((s) => s.getFolderForChat(chat.id));
 
   function commitRename() {
     setEditing(false);
@@ -95,6 +102,32 @@ export function ChatHistoryItem({ chat, onRename, onDelete, onPin, onNavigate }:
           <DropdownMenuItem onClick={() => setEditing(true)}>
             <Pencil /> Rename
           </DropdownMenuItem>
+
+          {/* Move to folder */}
+          {folders.length > 0 && (
+            <>
+              <DropdownMenuSeparator />
+              {folders
+                .filter((f) => f.id !== currentFolder?.id)
+                .map((folder) => (
+                  <DropdownMenuItem
+                    key={folder.id}
+                    onClick={() => addChatToFolder(folder.id, chat.id)}
+                  >
+                    <FolderInput /> Move to &ldquo;{folder.name}&rdquo;
+                  </DropdownMenuItem>
+                ))}
+            </>
+          )}
+
+          {extraMenuItems && (
+            <>
+              <DropdownMenuSeparator />
+              {extraMenuItems}
+            </>
+          )}
+
+          <DropdownMenuSeparator />
           <DropdownMenuItem variant="destructive" onClick={() => onDelete(chat.id)}>
             <Trash2 /> Delete
           </DropdownMenuItem>
