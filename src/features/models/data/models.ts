@@ -49,6 +49,47 @@ export interface ClaudeVariant {
   speed: "fast" | "standard" | "slower";
 }
 
+export interface ProviderVariant {
+  id: string;
+  name: string;
+  description: string;
+  badge?: string;
+  speed: "fast" | "standard" | "slower";
+}
+
+export const DEEPSEEK_VARIANTS: ProviderVariant[] = [
+  {
+    id: "deepseek-chat",
+    name: "DeepSeek V3",
+    description: "Fast and capable — everyday tasks and coding",
+    badge: "V3",
+    speed: "fast",
+  },
+  {
+    id: "deepseek-reasoner",
+    name: "DeepSeek R1",
+    description: "Advanced reasoning and complex problem solving",
+    badge: "R1",
+    speed: "slower",
+  },
+];
+
+export const GROK_VARIANTS: ProviderVariant[] = [
+  {
+    id: "grok-4",
+    name: "Grok 4.6",
+    description: "Flagship model — long-horizon agentic coding and real-world knowledge",
+    badge: "4.6",
+    speed: "standard",
+  },
+  {
+    id: "grok-3",
+    name: "Grok 4.3",
+    description: "Chat model with 1M context — great for long documents",
+    badge: "4.3",
+    speed: "fast",
+  },
+];
 export const CLAUDE_VARIANTS: ClaudeVariant[] = [
   {
     id: "claude-haiku-4-5",
@@ -102,6 +143,26 @@ export const AI_MODELS: AiModel[] = [
     available: true,
   },
   {
+    id: "deepseek-omni",
+    provider: "DeepSeek",
+    name: "DeepSeek",
+    description: "Efficient reasoning model, great for math and code",
+    speed: "fast",
+    logo: deepseekLogo,
+    color: "#4D6BFE",
+    available: true,
+  },
+  {
+    id: "grok-omni",
+    provider: "xAI",
+    name: "Grok",
+    description: "Real-time knowledge with a conversational edge",
+    speed: "fast",
+    logo: grokLogo,
+    color: "#111827",
+    available: true,
+  },
+  {
     id: "gemini-omni",
     provider: "Google",
     name: "Gemini",
@@ -112,16 +173,6 @@ export const AI_MODELS: AiModel[] = [
     available: false,
   },
   {
-    id: "deepseek-omni",
-    provider: "DeepSeek",
-    name: "DeepSeek",
-    description: "Efficient reasoning model, great for math and code",
-    speed: "fast",
-    logo: deepseekLogo,
-    color: "#4D6BFE",
-    available: false,
-  },
-  {
     id: "kimi-omni",
     provider: "Moonshot AI",
     name: "Kimi",
@@ -129,16 +180,6 @@ export const AI_MODELS: AiModel[] = [
     speed: "standard",
     logo: kimiLogo,
     color: "#0F9D8B",
-    available: false,
-  },
-  {
-    id: "grok-omni",
-    provider: "xAI",
-    name: "Grok",
-    description: "Real-time knowledge with a conversational edge",
-    speed: "fast",
-    logo: grokLogo,
-    color: "#111827",
     available: false,
   },
   {

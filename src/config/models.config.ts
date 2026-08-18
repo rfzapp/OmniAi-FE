@@ -1,36 +1,49 @@
-import { AI_MODELS, GPT_VARIANTS, CLAUDE_VARIANTS } from "@/features/models/data/models";
+import { AI_MODELS, GPT_VARIANTS, CLAUDE_VARIANTS, DEEPSEEK_VARIANTS, GROK_VARIANTS } from "@/features/models/data/models";
 
 export const DEFAULT_MODEL_ID = "gpt-omni";
 export const DEFAULT_GPT_VARIANT_ID = "gpt-5.6-luna";
 export const DEFAULT_CLAUDE_VARIANT_ID = "claude-haiku-4-5";
+export const DEFAULT_DEEPSEEK_VARIANT_ID = "deepseek-chat";
+export const DEFAULT_GROK_VARIANT_ID = "grok-4";
 
 /** Real model string mapped per UI model ID. */
 const API_MODEL_MAP: Record<string, string> = {
-  "gpt-omni":           "gpt-5.6-sol",
-  "gpt-5.6-sol":        "gpt-5.6-sol",
-  "gpt-5.6-terra":      "gpt-5.6-terra",
-  "gpt-5.6-luna":       "gpt-5.6-luna",
-  "gpt-4.1-mini":       "gpt-5.6-luna",    // legacy fallback
-  "claude-omni":        "claude-haiku-4-5-20251001",
-  "claude-haiku-4-5":   "claude-haiku-4-5-20251001",
-  "claude-sonnet-5":    "claude-sonnet-5",
-  "claude-fable-5":     "claude-fable-5",
-  "claude-opus-5":      "claude-opus-5",
+  "gpt-omni":             "gpt-5.6-sol",
+  "gpt-5.6-sol":          "gpt-5.6-sol",
+  "gpt-5.6-terra":        "gpt-5.6-terra",
+  "gpt-5.6-luna":         "gpt-5.6-luna",
+  "gpt-4.1-mini":         "gpt-5.6-luna",
+  "claude-omni":          "claude-haiku-4-5-20251001",
+  "claude-haiku-4-5":     "claude-haiku-4-5-20251001",
+  "claude-sonnet-5":      "claude-sonnet-5",
+  "claude-fable-5":       "claude-fable-5",
+  "claude-opus-5":        "claude-opus-5",
+  "deepseek-omni":        "deepseek-chat",
+  "deepseek-chat":        "deepseek-chat",
+  "deepseek-reasoner":    "deepseek-reasoner",
+  "grok-omni":            "grok-4",
+  "grok-4":               "grok-4",
+  "grok-3":               "grok-3",
 };
 
 export function resolveApiModel(modelId: string): string {
   return API_MODEL_MAP[modelId] ?? API_MODEL_MAP[DEFAULT_MODEL_ID]!;
 }
 
-/** Reverse of resolveApiModel — used to hydrate the UI selection from a backend-stored API model string. */
+/** Reverse of resolveApiModel — maps API model string back to the most specific UI model ID. */
 export function getUiModelIdForApiModel(apiModel: string): string {
-  const entry = Object.entries(API_MODEL_MAP).find(([, api]) => api === apiModel);
-  return entry?.[0] ?? DEFAULT_MODEL_ID;
+  const entries = Object.entries(API_MODEL_MAP).filter(([, api]) => api === apiModel);
+  if (entries.length === 0) return DEFAULT_MODEL_ID;
+  // Prefer the specific variant key (e.g. "claude-haiku-4-5") over the generic "-omni" alias
+  const specific = entries.find(([key]) => !key.endsWith("-omni"));
+  return (specific ?? entries[0]!)[0];
 }
 
 export function isModelAvailable(modelId: string): boolean {
   if (modelId === "gpt-omni" || GPT_VARIANTS.some((v) => v.id === modelId)) return true;
   if (modelId === "claude-omni" || CLAUDE_VARIANTS.some((v) => v.id === modelId)) return true;
+  if (modelId === "deepseek-omni" || DEEPSEEK_VARIANTS.some((v) => v.id === modelId)) return true;
+  if (modelId === "grok-omni" || GROK_VARIANTS.some((v) => v.id === modelId)) return true;
   return AI_MODELS.find((m) => m.id === modelId)?.available ?? false;
 }
 
@@ -39,5 +52,9 @@ export function getModelName(modelId: string): string {
   if (gptVariant) return gptVariant.name;
   const claudeVariant = CLAUDE_VARIANTS.find((v) => v.id === modelId);
   if (claudeVariant) return claudeVariant.name;
+  const deepseekVariant = DEEPSEEK_VARIANTS.find((v) => v.id === modelId);
+  if (deepseekVariant) return deepseekVariant.name;
+  const grokVariant = GROK_VARIANTS.find((v) => v.id === modelId);
+  if (grokVariant) return grokVariant.name;
   return AI_MODELS.find((m) => m.id === modelId)?.name ?? "This model";
 }

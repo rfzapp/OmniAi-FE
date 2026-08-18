@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { Zap, Star, ShieldCheck, Bolt, Users } from "lucide-react";
 import { ComposerBar } from "./ComposerBar";
 import { useRemainingFreePrompts } from "@/store/useUsageStore";
@@ -93,63 +92,48 @@ export function ChatEmptyState({ onSend, disabled, statusMessage, statusIsError 
   );
 
   return (
-    <div className="flex w-full flex-1 flex-col overflow-y-auto">
-      {/* Centre section — tagline + prompt composer */}
-      <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center justify-center gap-6 px-4 py-6 min-h-0">
-        <motion.p
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="text-center text-lg font-medium text-muted-foreground sm:text-xl"
-        >
-          {siteConfig.tagline}
-        </motion.p>
-
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.1 }}
-          className="flex w-full flex-col items-center gap-3"
-        >
+    <div className="flex h-full w-full flex-1 flex-col overflow-y-auto">
+      {/* Top — tagline + composer */}
+      <div className="flex flex-col items-center gap-5 px-4 pt-10 pb-6 sm:pt-14 sm:pb-8">
+        <div className="flex flex-col items-center gap-2">
+          <p className="text-center text-2xl font-semibold text-foreground sm:text-3xl">
+            {siteConfig.tagline}
+          </p>
           <span className={badgeClass}>
             <Zap className="size-3.5" />
             {displayMsg}
           </span>
-
+        </div>
+        <div className="w-full max-w-2xl">
           <ComposerBar onSend={onSend} disabled={disabled} />
-        </motion.div>
+        </div>
       </div>
 
-      {/* Feature cards — compact secondary row above global footer */}
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.2 }}
-        className="w-full border-t border-border/40 bg-background px-4 py-3"
-      >
-        <div className="mx-auto grid w-full max-w-4xl grid-cols-2 gap-2.5 sm:grid-cols-4">
+      {/* Bottom — feature cards */}
+      <div className="px-4 pb-6 sm:px-6">
+        <div className="mx-auto grid w-full max-w-5xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {featureCards.map((card) => (
             <div
               key={card.title}
-              className="group flex flex-col gap-2 rounded-lg border border-border/50 bg-card/60 p-3 transition-all duration-200 hover:border-border hover:bg-card hover:shadow-sm"
+              className="group flex flex-col gap-3 rounded-xl border border-border bg-card p-5 shadow-sm transition-all duration-200 hover:border-foreground/20 hover:shadow-md"
             >
-              <div className="flex items-center gap-2">
-                <div className={cn("flex h-6 w-6 shrink-0 items-center justify-center rounded-md", card.iconBg)}>
-                  <card.icon className={cn("size-3.5", card.iconColor)} />
-                </div>
-                <h3 className="text-xs font-semibold text-foreground leading-tight truncate">{card.title}</h3>
+              <div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-xl", card.iconBg)}>
+                <card.icon className={cn("size-5", card.iconColor)} />
               </div>
-              <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-2">{card.description}</p>
+              <div className="flex flex-col gap-1.5">
+                <h3 className="text-sm font-semibold text-foreground">{card.title}</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed">{card.description}</p>
+              </div>
               <a
                 href={card.link}
-                className="mt-auto text-[11px] font-medium text-brand-600 hover:underline flex items-center gap-0.5 group-hover:gap-1 transition-all"
+                className="mt-auto text-xs font-medium text-foreground/60 hover:text-foreground flex items-center gap-1 transition-all group-hover:gap-1.5"
               >
                 Learn more <span className="transition-transform group-hover:translate-x-0.5">→</span>
               </a>
             </div>
           ))}
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }

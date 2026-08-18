@@ -83,7 +83,7 @@ export function PromptFooter() {
                     </DialogContent>
                 </Dialog>
 
-                {/* Status */}
+                {/* Online status */}
                 <a
                     href="https://status.omniai.com"
                     target="_blank"
@@ -94,7 +94,7 @@ export function PromptFooter() {
                         <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
                         <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
                     </span>
-                    <span>Status</span>
+                    <span>online</span>
                 </a>
             </div>
         </div>
