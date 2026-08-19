@@ -18,12 +18,12 @@ export function SubscriptionUsageRows() {
     promptBadge = `${promptCount} / ${FREE_PROMPT_LIMIT}`;
   } else {
     const promptCount24h = user?.promptCount24h ?? 0;
-    let limit24h = 100;
-    if (subscription === "pro") limit24h = 500;
-    else if (subscription === "ultra_pro") limit24h = 1500;
+    let limitMonthly = 100;
+    if (subscription === "pro") limitMonthly = 500;
+    else if (subscription === "ultra_pro") limitMonthly = 1500;
 
-    promptText = `${promptCount24h} of ${limit24h} prompts daily`;
-    promptBadge = `${promptCount24h} / ${limit24h}`;
+    promptText = `${promptCount24h} of ${limitMonthly} prompts monthly`;
+    promptBadge = `${promptCount24h} / ${limitMonthly}`;
   }
 
   let attachmentText = "";
@@ -33,12 +33,12 @@ export function SubscriptionUsageRows() {
     attachmentBadge = "0 / 0";
   } else {
     const attachmentCount24h = user?.attachmentCount24h ?? 0;
-    let limit24h = 3;
-    if (subscription === "pro") limit24h = 15;
-    else if (subscription === "ultra_pro") limit24h = 45;
+    let limitMonthly = 3;
+    if (subscription === "pro") limitMonthly = 15;
+    else if (subscription === "ultra_pro") limitMonthly = 45;
 
-    attachmentText = `${attachmentCount24h} of ${limit24h} file attachments daily`;
-    attachmentBadge = `${attachmentCount24h} / ${limit24h}`;
+    attachmentText = `${attachmentCount24h} of ${limitMonthly} file attachments monthly`;
+    attachmentBadge = `${attachmentCount24h} / ${limitMonthly}`;
   }
 
   return (

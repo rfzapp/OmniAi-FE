@@ -90,6 +90,71 @@ export const GROK_VARIANTS: ProviderVariant[] = [
     speed: "fast",
   },
 ];
+
+export const QWEN_VARIANTS: ProviderVariant[] = [
+  {
+    id: "qwen-max",
+    name: "Qwen Max",
+    description: "Most capable Qwen — complex reasoning and long context",
+    badge: "Max",
+    speed: "standard",
+  },
+  {
+    id: "qwen-plus",
+    name: "Qwen Plus",
+    description: "Balanced performance for everyday tasks",
+    badge: "Plus",
+    speed: "fast",
+  },
+  {
+    id: "qwen-turbo",
+    name: "Qwen Turbo",
+    description: "Fastest and most cost-efficient Qwen model",
+    badge: "Turbo",
+    speed: "fast",
+  },
+];
+
+export const MISTRAL_VARIANTS: ProviderVariant[] = [
+  {
+    id: "mistral-large-latest",
+    name: "Mistral Large",
+    description: "Most capable Mistral — complex tasks and reasoning",
+    badge: "Large",
+    speed: "standard",
+  },
+  {
+    id: "mistral-small-latest",
+    name: "Mistral Small",
+    description: "Fast and efficient for everyday tasks",
+    badge: "Small",
+    speed: "fast",
+  },
+];
+
+export const KIMI_VARIANTS: ProviderVariant[] = [
+  {
+    id: "kimi-k3",
+    name: "Kimi K3",
+    description: "Flagship model — 1M context, frontier coding and reasoning",
+    badge: "K3",
+    speed: "standard",
+  },
+  {
+    id: "kimi-k2.6",
+    name: "Kimi K2.6",
+    description: "Balanced performance with long-context capability",
+    badge: "K2.6",
+    speed: "fast",
+  },
+  {
+    id: "moonshot-v1-128k",
+    name: "Kimi 128K",
+    description: "128K context window — ideal for large documents",
+    badge: "128K",
+    speed: "standard",
+  },
+];
 export const CLAUDE_VARIANTS: ClaudeVariant[] = [
   {
     id: "claude-haiku-4-5",
@@ -122,94 +187,13 @@ export const CLAUDE_VARIANTS: ClaudeVariant[] = [
 ];
 
 export const AI_MODELS: AiModel[] = [
-  {
-    id: "gpt-omni",
-    provider: "OpenAI",
-    name: "GPT",
-    description: "Versatile all-rounder, strong at reasoning and coding",
-    speed: "standard",
-    logo: chatgptLogo,
-    color: "#10A37F",
-    available: true,
-  },
-  {
-    id: "claude-omni",
-    provider: "Anthropic",
-    name: "Claude",
-    description: "Thoughtful, careful writing and long-context analysis",
-    speed: "standard",
-    logo: claudeLogo,
-    color: "#D97757",
-    available: true,
-  },
-  {
-    id: "deepseek-omni",
-    provider: "DeepSeek",
-    name: "DeepSeek",
-    description: "Efficient reasoning model, great for math and code",
-    speed: "fast",
-    logo: deepseekLogo,
-    color: "#4D6BFE",
-    available: true,
-  },
-  {
-    id: "grok-omni",
-    provider: "xAI",
-    name: "Grok",
-    description: "Real-time knowledge with a conversational edge",
-    speed: "fast",
-    logo: grokLogo,
-    color: "#111827",
-    available: true,
-  },
-  {
-    id: "gemini-omni",
-    provider: "Google",
-    name: "Gemini",
-    description: "Multimodal reasoning with fast turnaround",
-    speed: "fast",
-    logo: geminiLogo,
-    color: "#4285F4",
-    available: false,
-  },
-  {
-    id: "kimi-omni",
-    provider: "Moonshot AI",
-    name: "Kimi",
-    description: "Long-context specialist for large documents",
-    speed: "standard",
-    logo: kimiLogo,
-    color: "#0F9D8B",
-    available: false,
-  },
-  {
-    id: "llama-omni",
-    provider: "Meta",
-    name: "Llama",
-    description: "Open-weight model tuned for flexibility",
-    speed: "fast",
-    logo: llamaLogo,
-    color: "#0668E1",
-    available: false,
-  },
-  {
-    id: "mistral-omni",
-    provider: "Mistral AI",
-    name: "Mistral",
-    description: "Lightweight and fast for everyday tasks",
-    speed: "fast",
-    logo: mistralLogo,
-    color: "#FA5B0F",
-    available: false,
-  },
-  {
-    id: "qwen-omni",
-    provider: "Alibaba",
-    name: "Qwen",
-    description: "Strong multilingual and coding performance",
-    speed: "slower",
-    logo: qwenLogo,
-    color: "#6C5CE7",
-    available: false,
-  },
+  { id: "gpt-omni",      provider: "OpenAI",      name: "GPT",      description: "Versatile all-rounder, strong at reasoning and coding",   speed: "standard", logo: chatgptLogo,  color: "#10A37F", available: true  },
+  { id: "claude-omni",   provider: "Anthropic",   name: "Claude",   description: "Thoughtful, careful writing and long-context analysis",   speed: "standard", logo: claudeLogo,   color: "#D97757", available: true  },
+  { id: "deepseek-omni", provider: "DeepSeek",    name: "DeepSeek", description: "Efficient reasoning model, great for math and code",      speed: "fast",     logo: deepseekLogo, color: "#4D6BFE", available: true  },
+  { id: "grok-omni",     provider: "xAI",         name: "Grok",     description: "Real-time knowledge with a conversational edge",          speed: "fast",     logo: grokLogo,     color: "#111827", available: true  },
+  { id: "qwen-omni",     provider: "Alibaba",     name: "Qwen",     description: "Strong multilingual and coding performance",              speed: "fast",     logo: qwenLogo,     color: "#6C5CE7", available: true  },
+  { id: "mistral-omni",  provider: "Mistral AI",  name: "Mistral",  description: "Lightweight and fast for everyday tasks",                 speed: "fast",     logo: mistralLogo,  color: "#FA5B0F", available: true  },
+  { id: "kimi-omni",     provider: "Moonshot AI", name: "Kimi",     description: "Long-context specialist for large documents",             speed: "standard", logo: kimiLogo,     color: "#0F9D8B", available: true  },
+  { id: "gemini-omni",   provider: "Google",      name: "Gemini",   description: "Multimodal reasoning with fast turnaround",               speed: "fast",     logo: geminiLogo,   color: "#4285F4", available: false },
+  { id: "llama-omni",    provider: "Meta",        name: "Llama",    description: "Open-weight model tuned for flexibility",                 speed: "fast",     logo: llamaLogo,    color: "#0668E1", available: false },
 ];
