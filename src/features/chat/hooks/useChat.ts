@@ -245,7 +245,14 @@ export function useChat(chatId?: string) {
         (partial) => updateMessage(activeChatId, assistantMessageId, { content: partial }),
         () => {
           setStreamingMessageId(null);
-          void loadChats();
+          // Only do a full reload for new conversations (to pick up title etc.)
+          // For existing chats just bump updatedAt locally — avoids a network round-trip per message.
+          if (!targetChatId) {
+            void loadChats();
+          } else {
+            const existing = useChatStore.getState().chats.find((c) => c.id === activeChatId);
+            if (existing) upsertChat({ ...existing, updatedAt: new Date().toISOString() });
+          }
         }
       );
 
@@ -284,7 +291,8 @@ export function useChat(chatId?: string) {
           (partial) => updateMessage(targetChatId, messageId, { content: partial }),
           () => {
             setStreamingMessageId(null);
-            void loadChats();
+            const existing = useChatStore.getState().chats.find((c) => c.id === targetChatId);
+            if (existing) upsertChat({ ...existing, updatedAt: new Date().toISOString() });
           }
         );
       } catch (err) {

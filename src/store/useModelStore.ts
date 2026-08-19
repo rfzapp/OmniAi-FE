@@ -6,6 +6,9 @@ import {
   DEFAULT_CLAUDE_VARIANT_ID,
   DEFAULT_DEEPSEEK_VARIANT_ID,
   DEFAULT_GROK_VARIANT_ID,
+  DEFAULT_QWEN_VARIANT_ID,
+  DEFAULT_MISTRAL_VARIANT_ID,
+  DEFAULT_KIMI_VARIANT_ID,
 } from "@/config/models.config";
 
 interface ModelState {
@@ -14,11 +17,17 @@ interface ModelState {
   selectedClaudeVariantId: string;
   selectedDeepSeekVariantId: string;
   selectedGrokVariantId: string;
+  selectedQwenVariantId: string;
+  selectedMistralVariantId: string;
+  selectedKimiVariantId: string;
   setSelectedModelId: (id: string) => void;
-  setSelectedGptVariantId: (variantId: string) => void;
-  setSelectedClaudeVariantId: (variantId: string) => void;
-  setSelectedDeepSeekVariantId: (variantId: string) => void;
-  setSelectedGrokVariantId: (variantId: string) => void;
+  setSelectedGptVariantId: (id: string) => void;
+  setSelectedClaudeVariantId: (id: string) => void;
+  setSelectedDeepSeekVariantId: (id: string) => void;
+  setSelectedGrokVariantId: (id: string) => void;
+  setSelectedQwenVariantId: (id: string) => void;
+  setSelectedMistralVariantId: (id: string) => void;
+  setSelectedKimiVariantId: (id: string) => void;
   getEffectiveModelId: () => string;
 }
 
@@ -30,22 +39,27 @@ export const useModelStore = create<ModelState>()(
       selectedClaudeVariantId: DEFAULT_CLAUDE_VARIANT_ID,
       selectedDeepSeekVariantId: DEFAULT_DEEPSEEK_VARIANT_ID,
       selectedGrokVariantId: DEFAULT_GROK_VARIANT_ID,
+      selectedQwenVariantId: DEFAULT_QWEN_VARIANT_ID,
+      selectedMistralVariantId: DEFAULT_MISTRAL_VARIANT_ID,
+      selectedKimiVariantId: DEFAULT_KIMI_VARIANT_ID,
       setSelectedModelId: (id) => set({ selectedModelId: id }),
-      setSelectedGptVariantId: (variantId) =>
-        set({ selectedModelId: "gpt-omni", selectedGptVariantId: variantId }),
-      setSelectedClaudeVariantId: (variantId) =>
-        set({ selectedModelId: "claude-omni", selectedClaudeVariantId: variantId }),
-      setSelectedDeepSeekVariantId: (variantId) =>
-        set({ selectedModelId: "deepseek-omni", selectedDeepSeekVariantId: variantId }),
-      setSelectedGrokVariantId: (variantId) =>
-        set({ selectedModelId: "grok-omni", selectedGrokVariantId: variantId }),
+      setSelectedGptVariantId: (id) => set({ selectedModelId: "gpt-omni", selectedGptVariantId: id }),
+      setSelectedClaudeVariantId: (id) => set({ selectedModelId: "claude-omni", selectedClaudeVariantId: id }),
+      setSelectedDeepSeekVariantId: (id) => set({ selectedModelId: "deepseek-omni", selectedDeepSeekVariantId: id }),
+      setSelectedGrokVariantId: (id) => set({ selectedModelId: "grok-omni", selectedGrokVariantId: id }),
+      setSelectedQwenVariantId: (id) => set({ selectedModelId: "qwen-omni", selectedQwenVariantId: id }),
+      setSelectedMistralVariantId: (id) => set({ selectedModelId: "mistral-omni", selectedMistralVariantId: id }),
+      setSelectedKimiVariantId: (id) => set({ selectedModelId: "kimi-omni", selectedKimiVariantId: id }),
       getEffectiveModelId: () => {
-        const { selectedModelId, selectedGptVariantId, selectedClaudeVariantId, selectedDeepSeekVariantId, selectedGrokVariantId } = get();
-        if (selectedModelId === "gpt-omni") return selectedGptVariantId;
-        if (selectedModelId === "claude-omni") return selectedClaudeVariantId;
-        if (selectedModelId === "deepseek-omni") return selectedDeepSeekVariantId;
-        if (selectedModelId === "grok-omni") return selectedGrokVariantId;
-        return selectedModelId;
+        const s = get();
+        if (s.selectedModelId === "gpt-omni") return s.selectedGptVariantId;
+        if (s.selectedModelId === "claude-omni") return s.selectedClaudeVariantId;
+        if (s.selectedModelId === "deepseek-omni") return s.selectedDeepSeekVariantId;
+        if (s.selectedModelId === "grok-omni") return s.selectedGrokVariantId;
+        if (s.selectedModelId === "qwen-omni") return s.selectedQwenVariantId;
+        if (s.selectedModelId === "mistral-omni") return s.selectedMistralVariantId;
+        if (s.selectedModelId === "kimi-omni") return s.selectedKimiVariantId;
+        return s.selectedModelId;
       },
     }),
     { name: "omniai-model" },

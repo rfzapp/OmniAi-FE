@@ -20,20 +20,20 @@ const PLANS: PlanOption[] = [
     key: "standard",
     name: "Standard",
     price: "$25/mo",
-    features: ["All models", "100 prompts daily", "Limit to 3 file attachments daily"],
+    features: ["All models", "100 prompts monthly", "Limit to 3 file attachments monthly"],
     highlighted: true,
   },
   {
     key: "pro",
     name: "Pro",
     price: "$100/mo",
-    features: ["Everything in Standard", "500 prompts daily", "Limit to 15 file attachments daily"],
+    features: ["Everything in Standard", "500 prompts monthly", "Limit to 15 file attachments monthly"],
   },
   {
     key: "ultra_pro",
     name: "Ultra Pro",
     price: "$200/mo",
-    features: ["Everything in Pro", "1500 prompts daily", "Limit to 45 file attachments daily"],
+    features: ["Everything in Pro", "1500 prompts monthly", "Limit to 45 file attachments monthly"],
   },
 ];
 

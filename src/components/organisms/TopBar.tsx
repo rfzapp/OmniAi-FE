@@ -21,9 +21,9 @@ export function TopBar() {
   const subscription = useAuthStore((s) => s.user?.subscription ?? "free");
 
   const planLabel =
-    subscription === "ultra_pro" ? `Ultra Pro — ${remaining} left`
-    : subscription === "pro" ? `Pro — ${remaining} left`
-    : subscription === "standard" ? `Standard — ${remaining} left`
+    subscription === "ultra_pro" ? `Ultra Pro — ${remaining} left this month`
+    : subscription === "pro" ? `Pro — ${remaining} left this month`
+    : subscription === "standard" ? `Standard — ${remaining} left this month`
     : null;
 
   return (

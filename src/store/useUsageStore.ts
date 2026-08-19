@@ -30,11 +30,11 @@ export function useRemainingFreePrompts(): number {
   }
 
   const promptCount24h = user.promptCount24h ?? 0;
-  let dailyLimit = 100;
-  if (subscription === "pro") dailyLimit = 500;
-  else if (subscription === "ultra_pro") dailyLimit = 1500;
+  let monthlyLimit = 100;
+  if (subscription === "pro") monthlyLimit = 500;
+  else if (subscription === "ultra_pro") monthlyLimit = 1500;
 
-  return Math.max(0, dailyLimit - promptCount24h);
+  return Math.max(0, monthlyLimit - promptCount24h);
 }
 
 export function useIsUnlimitedPlan(): boolean {
