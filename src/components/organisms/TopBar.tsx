@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, Settings, Zap } from "lucide-react";
+import { Menu, Star, Bell } from "lucide-react";
 import { IconButton } from "@/components/atoms/IconButton";
 import { Button } from "@/components/atoms/Button";
 import { Logo } from "@/components/atoms/Logo";
@@ -28,6 +28,7 @@ export function TopBar() {
 
   return (
     <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between gap-2 bg-transparent px-3 backdrop-blur-sm sm:px-5">
+      {/* Mobile: hamburger + logo */}
       <div className="flex items-center gap-2 md:hidden">
         <IconButton label="Open menu" showTooltip={false} onClick={() => setMobileOpen(true)}>
           <Menu className="size-4" />
@@ -36,47 +37,53 @@ export function TopBar() {
       </div>
       <div className="hidden md:block" />
 
-      <div className="flex items-center gap-1.5 sm:gap-2.5">
-        {isUnlimited && planLabel ? (
-          <button
+      <div className="flex items-center gap-2 sm:gap-3">
+        {/* Prompts remaining pill — paid plans */}
+        {isUnlimited && planLabel && (
+          <span
             suppressHydrationWarning
-            type="button"
-            onClick={openUpgradeModal}
-            className="hidden items-center gap-1.5 rounded-full border border-border bg-muted px-3 py-1.5 text-xs font-medium text-foreground sm:flex hover:border-foreground/30"
+            className="hidden select-none items-center rounded-full border border-border bg-muted px-3 py-1 text-xs font-medium text-muted-foreground sm:flex"
           >
-            <Zap className="size-3.5 text-foreground" />
             {planLabel}
-          </button>
-        ) : !isUnlimited ? (
-          <>
-            <button
-              suppressHydrationWarning
-              type="button"
-              onClick={openUpgradeModal}
-              className="hidden items-center gap-1.5 rounded-full border border-border bg-secondary px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground sm:flex"
-            >
-              <Zap className="size-3.5 text-foreground/60" />
-              {remaining} / {FREE_PROMPT_LIMIT} Free Prompts
-            </button>
-            <Button
-              type="button"
-              size="sm"
-              onClick={openUpgradeModal}
-              className="rounded-full px-3.5 shadow-sm"
-            >
-              Upgrade
-            </Button>
-          </>
-        ) : null}
+          </span>
+        )}
 
+        {/* Upgrade Plan button */}
+        {!isUnlimited ? (
+          <Button
+            type="button"
+            size="sm"
+            onClick={openUpgradeModal}
+            className="hidden items-center gap-1.5 rounded-lg px-3.5 shadow-sm sm:flex"
+          >
+            <Star className="size-3.5 fill-current" />
+            Upgrade Plan
+          </Button>
+        ) : (
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={openUpgradeModal}
+            className="hidden items-center gap-1.5 rounded-lg px-3.5 sm:flex"
+          >
+            <Star className="size-3.5 fill-current" />
+            Upgrade Plan
+          </Button>
+        )}
+
+        {/* Bell icon */}
         <Link
           href={ROUTES.settings}
-          aria-label="Settings"
-          className="flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          aria-label="Notifications"
+          className="relative flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         >
-          <Settings className="size-4" />
+          <Bell className="size-4" />
+          {/* Notification dot */}
+          <span className="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-primary" />
         </Link>
 
+        {/* Avatar / profile */}
         {isAuthenticated ? (
           <ProfileMenu collapsed />
         ) : (

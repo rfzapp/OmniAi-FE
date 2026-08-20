@@ -80,6 +80,100 @@ export const chatService = {
     return data.messages.map((m) => toMessage(m, chatId));
   },
 
+  /**
+   * Streams the AI response via SSE.
+   * Calls onToken for each arriving token, then resolves with full result once done.
+   */
+  sendChatMessageStream: async (
+    params: SendChatMessageParams,
+    onToken: (token: string) => void,
+    signal?: AbortSignal,
+  ): Promise<SendChatMessageResult> => {
+    const base = (process.env.NEXT_PUBLIC_API_BASE_URL ?? "").replace(/\/$/, "");
+    const token = (await import("@/store/useAuthStore")).useAuthStore.getState().accessToken;
+
+    let body: BodyInit;
+    let headers: Record<string, string> = {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
+
+    const hasAttachments = Boolean(params.attachments?.length);
+    if (hasAttachments) {
+      const formData = new FormData();
+      formData.append("model", params.model);
+      formData.append("message", params.message);
+      if (params.conversationId) formData.append("conversationId", params.conversationId);
+      params.attachments?.forEach((a) => {
+        if (a.file) formData.append("attachments", a.file, a.name);
+      });
+      body = formData;
+    } else {
+      headers["Content-Type"] = "application/json";
+      body = JSON.stringify({
+        model: params.model,
+        message: params.message,
+        ...(params.conversationId ? { conversationId: params.conversationId } : {}),
+      });
+    }
+
+    const response = await fetch(`${base}/ai/chat/stream`, {
+      method: "POST",
+      headers,
+      body,
+      credentials: "include",
+      signal,
+    });
+
+    if (!response.ok || !response.body) {
+      const text = await response.text().catch(() => "");
+      throw new Error(text || `Stream request failed with status ${response.status}`);
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+    let finalResult: SendChatMessageResult | null = null;
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split("\n");
+      buffer = lines.pop() ?? "";
+
+      for (const line of lines) {
+        if (!line.startsWith("data: ")) continue;
+        const json = line.slice(6).trim();
+        if (!json) continue;
+
+        let parsed: Record<string, unknown>;
+        try {
+          parsed = JSON.parse(json);
+        } catch {
+          continue;
+        }
+
+        if (parsed.error) {
+          throw new Error((parsed.message as string) ?? "Stream error");
+        }
+
+        if (parsed.done) {
+          const conv = parsed.conversation as BackendConversation;
+          const msg = parsed.message as BackendMessage;
+          const usage = parsed.usage as ChatUsage;
+          const conversation = toChat(conv);
+          finalResult = { conversation, message: toMessage(msg, conversation.id), usage };
+        } else if (typeof parsed.token === "string") {
+          onToken(parsed.token);
+        }
+      }
+    }
+
+    if (!finalResult) throw new Error("Stream ended without a completion event");
+    return finalResult;
+  },
+
   sendChatMessage: async (params: SendChatMessageParams): Promise<SendChatMessageResult> => {
     const hasAttachments = Boolean(params.attachments?.length);
 
@@ -128,7 +222,6 @@ export const chatService = {
     return httpClient.get(`/conversations/shared/${token}`);
   },
 
-  // Renaming isn't backed by the API yet — local-only for now.
   renameChat: async (_id: string, _title: string): Promise<void> => { },
 
   pinChat: async (id: string, isPinned: boolean): Promise<void> => {

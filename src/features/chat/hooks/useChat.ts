@@ -1,12 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Attachment } from "@/features/prompt/types";
 import { useChatStore } from "@/store/useChatStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useUsageStore } from "@/store/useUsageStore";
 import { chatService } from "../services/chatService";
-import { useStreamingMessage } from "./useStreamingMessage";
 import { DEFAULT_MODEL_ID, getModelName, isModelAvailable, resolveApiModel } from "@/config/models.config";
 import { ApiError, getApiErrorMessage } from "@/services/httpClient";
 
@@ -34,9 +33,6 @@ function createId(): string {
     : `id-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
-// Backend conversation ids are Mongo ObjectIds. Guards against stale/bad
-// ids (e.g. a browser tab left on /c/undefined) instead of forwarding them
-// to the API and erroring out.
 function isValidChatId(id?: string): id is string {
   return !!id && /^[0-9a-fA-F]{24}$/.test(id);
 }
@@ -54,9 +50,9 @@ export function useChat(chatId?: string) {
   const updateMessage = useChatStore((s) => s.updateMessage);
   const removeMessage = useChatStore((s) => s.removeMessage);
   const setStreamingMessageId = useChatStore((s) => s.setStreamingMessageId);
-  const streaming = useStreamingMessage();
   const isAuthReady = useAuthStore((s) => s.hasHydrated && s.isAuthenticated && s.isAuthBootstrapComplete);
   const [chatNotFound, setChatNotFound] = useState(false);
+  const abortRef = useRef<AbortController | null>(null);
 
   const messages = (chatId && messagesByChat[chatId]) || [];
 
@@ -80,8 +76,6 @@ export function useChat(chatId?: string) {
       if (chatId) setChatNotFound(true);
       return;
     }
-    // Don't load messages until auth is ready — firing before hydration
-    // sends an unauthenticated request that can wipe the session.
     if (!isAuthReady) return;
     if (messagesByChat[chatId]) return;
     chatService
@@ -102,7 +96,7 @@ export function useChat(chatId?: string) {
       await chatService.deleteChat(id);
       removeChat(id);
     },
-    [removeChat]
+    [removeChat],
   );
 
   const renameChat = useCallback(
@@ -111,7 +105,7 @@ export function useChat(chatId?: string) {
       const chat = useChatStore.getState().chats.find((c) => c.id === id);
       if (chat) upsertChat({ ...chat, title });
     },
-    [upsertChat]
+    [upsertChat],
   );
 
   const pinChat = useCallback(
@@ -125,13 +119,14 @@ export function useChat(chatId?: string) {
         if (chat) upsertChat({ ...chat, isPinned: !isPinned });
       }
     },
-    [upsertChat]
+    [upsertChat],
   );
 
   const stopStreaming = useCallback(() => {
-    streaming.stop();
+    abortRef.current?.abort();
+    abortRef.current = null;
     setStreamingMessageId(null);
-  }, [streaming, setStreamingMessageId]);
+  }, [setStreamingMessageId]);
 
   const sendMessage = useCallback(
     async (content: string, modelId: string, rawTargetChatId?: string, attachments?: Attachment[]): Promise<string> => {
@@ -140,20 +135,14 @@ export function useChat(chatId?: string) {
       const apiModel = resolveApiModel(modelId);
 
       if (!targetChatId && !isModelAvailable(modelId)) {
-        // Brand-new chat: nothing rendered yet for this conversation, so
-        // there's nowhere to show a notice bubble — the caller (which
-        // ideally already pre-checked this) needs to handle it instead.
         throw new ModelUnavailableError(`${getModelName(modelId)} isn't available yet — coming soon! Try GPT for now.`);
       }
 
-      // Existing chat: we already have a stable id, so show the user's
       if (targetChatId) {
         const optimisticImageUrl = attachments?.[0]?.file ? URL.createObjectURL(attachments[0].file) : undefined;
         addMessage({ id: createId(), chatId: targetChatId, role: "user", content, createdAt: new Date().toISOString(), imageUrl: optimisticImageUrl });
 
         if (!isModelAvailable(modelId)) {
-          // Only OpenAI is actually wired up on the backend — don't spend a
-          // network call (or a free prompt) pretending other models work.
           addMessage({
             id: assistantMessageId,
             chatId: targetChatId,
@@ -165,41 +154,52 @@ export function useChat(chatId?: string) {
           return targetChatId;
         }
 
-        addMessage({
-          id: assistantMessageId,
-          chatId: targetChatId,
-          role: "assistant",
-          content: "",
-          createdAt: new Date().toISOString(),
-          modelId,
-        });
+        addMessage({ id: assistantMessageId, chatId: targetChatId, role: "assistant", content: "", createdAt: new Date().toISOString(), modelId });
         setStreamingMessageId(assistantMessageId);
       }
 
-      let result;
+      abortRef.current = new AbortController();
+      let activeChatId = targetChatId ?? "";
+
       try {
-        result = await chatService.sendChatMessage({
-          model: apiModel,
-          message: content,
-          conversationId: targetChatId,
-          attachments,
-        });
+        const result = await chatService.sendChatMessageStream(
+          { model: apiModel, message: content, conversationId: targetChatId, attachments },
+          (token) => {
+            const cid = activeChatId || targetChatId!;
+            const prev = useChatStore.getState().messagesByChat[cid]?.find((m) => m.id === assistantMessageId)?.content ?? "";
+            updateMessage(cid, assistantMessageId, { content: prev + token });
+          },
+          abortRef.current.signal,
+        );
+
         useAuthStore.getState().setPromptCount(result.usage.promptsUsed, result.usage.promptsUsed24h);
+        activeChatId = result.conversation.id;
+
+        if (!targetChatId) {
+          upsertChat(result.conversation);
+          const optimisticImageUrl = attachments?.[0]?.file ? URL.createObjectURL(attachments[0].file) : undefined;
+          addMessage({ id: createId(), chatId: activeChatId, role: "user", content, createdAt: new Date().toISOString(), imageUrl: optimisticImageUrl });
+          addMessage({ id: assistantMessageId, chatId: activeChatId, role: "assistant", content: result.message.content, createdAt: new Date().toISOString(), modelId });
+        }
+
+        setStreamingMessageId(null);
+
+        if (!targetChatId) {
+          void loadChats();
+        } else {
+          const existing = useChatStore.getState().chats.find((c) => c.id === activeChatId);
+          if (existing) upsertChat({ ...existing, updatedAt: new Date().toISOString() });
+        }
+
+        return activeChatId;
       } catch (err) {
         setStreamingMessageId(null);
+        abortRef.current = null;
+
         if (targetChatId) {
-          if (isNotFoundError(err)) {
-            // This conversation doesn't exist for us anymore (stale URL,
-            // deleted, wrong account) — bail out to the parent page rather
-            // than leaving the user stuck retrying against a dead chat.
-            removeChat(targetChatId);
-            setChatNotFound(true);
-            return targetChatId;
-          }
+          if (isNotFoundError(err)) { removeChat(targetChatId); setChatNotFound(true); return targetChatId; }
           if (isImageUpgradeError(err)) {
-            updateMessage(targetChatId, assistantMessageId, {
-              content: "Image generation requires an Image Generation plan. Please subscribe to unlock it. 🔒",
-            });
+            updateMessage(targetChatId, assistantMessageId, { content: "Image generation requires an Image Generation plan. Please subscribe to unlock it. 🔒" });
             useUsageStore.getState().openImageUpgradeModal();
             return targetChatId;
           }
@@ -208,57 +208,13 @@ export function useChat(chatId?: string) {
             useUsageStore.getState().openUpgradeModal();
             return targetChatId;
           }
-          // Already have a message bubble to show the error in — surface it
-          // there and stop, rather than also rejecting (which would crash
-          // into an unhandled-error overlay on top of the visible message).
           updateMessage(targetChatId, assistantMessageId, { content: getApiErrorMessage(err) });
           return targetChatId;
         }
-        // New chat: nothing rendered yet, so the caller needs to know it failed.
         throw err;
       }
-
-      const activeChatId = result.conversation.id;
-
-      // New chat: we only know the real id now, so add both messages at once.
-      if (!targetChatId) {
-        upsertChat(result.conversation);
-        const optimisticImageUrl = attachments?.[0]?.file ? URL.createObjectURL(attachments[0].file) : undefined;
-        addMessage({ id: createId(), chatId: activeChatId, role: "user", content, createdAt: new Date().toISOString(), imageUrl: optimisticImageUrl });
-        addMessage({
-          id: assistantMessageId,
-          chatId: activeChatId,
-          role: "assistant",
-          content: "",
-          createdAt: new Date().toISOString(),
-          modelId,
-          imageUrl: result.message.imageUrl,
-        });
-        setStreamingMessageId(assistantMessageId);
-      } else if (result.message.imageUrl) {
-        // Existing chat image: set imageUrl on the placeholder immediately
-        updateMessage(activeChatId, assistantMessageId, { imageUrl: result.message.imageUrl });
-      }
-
-      streaming.start(
-        result.message.content,
-        (partial) => updateMessage(activeChatId, assistantMessageId, { content: partial }),
-        () => {
-          setStreamingMessageId(null);
-          // Only do a full reload for new conversations (to pick up title etc.)
-          // For existing chats just bump updatedAt locally — avoids a network round-trip per message.
-          if (!targetChatId) {
-            void loadChats();
-          } else {
-            const existing = useChatStore.getState().chats.find((c) => c.id === activeChatId);
-            if (existing) upsertChat({ ...existing, updatedAt: new Date().toISOString() });
-          }
-        }
-      );
-
-      return activeChatId;
     },
-    [addMessage, updateMessage, removeMessage, setStreamingMessageId, streaming, upsertChat, loadChats, removeChat]
+    [addMessage, updateMessage, removeMessage, setStreamingMessageId, upsertChat, loadChats, removeChat, messagesByChat],
   );
 
   const regenerateMessage = useCallback(
@@ -271,39 +227,32 @@ export function useChat(chatId?: string) {
       const modelId = list[index]?.modelId ?? DEFAULT_MODEL_ID;
 
       if (!isModelAvailable(modelId)) {
-        updateMessage(targetChatId, messageId, {
-          content: `${getModelName(modelId)} isn't available yet — coming soon! Try GPT for now.`,
-        });
+        updateMessage(targetChatId, messageId, { content: `${getModelName(modelId)} isn't available yet — coming soon! Try GPT for now.` });
         return;
       }
 
       updateMessage(targetChatId, messageId, { content: "" });
       setStreamingMessageId(messageId);
+      abortRef.current = new AbortController();
+
       try {
-        const result = await chatService.sendChatMessage({
-          model: resolveApiModel(modelId),
-          message: lastUserMessage.content,
-          conversationId: targetChatId,
-        });
-        useAuthStore.getState().setPromptCount(result.usage.promptsUsed, result.usage.promptsUsed24h);
-        streaming.start(
-          result.message.content,
-          (partial) => updateMessage(targetChatId, messageId, { content: partial }),
-          () => {
-            setStreamingMessageId(null);
-            const existing = useChatStore.getState().chats.find((c) => c.id === targetChatId);
-            if (existing) upsertChat({ ...existing, updatedAt: new Date().toISOString() });
-          }
+        const result = await chatService.sendChatMessageStream(
+          { model: resolveApiModel(modelId), message: lastUserMessage.content, conversationId: targetChatId },
+          (token) => {
+            const prev = useChatStore.getState().messagesByChat[targetChatId]?.find((m) => m.id === messageId)?.content ?? "";
+            updateMessage(targetChatId, messageId, { content: prev + token });
+          },
+          abortRef.current.signal,
         );
+
+        useAuthStore.getState().setPromptCount(result.usage.promptsUsed, result.usage.promptsUsed24h);
+        setStreamingMessageId(null);
+        const existing = useChatStore.getState().chats.find((c) => c.id === targetChatId);
+        if (existing) upsertChat({ ...existing, updatedAt: new Date().toISOString() });
       } catch (err) {
         setStreamingMessageId(null);
-        if (isNotFoundError(err)) {
-          removeChat(targetChatId);
-          setChatNotFound(true);
-          return;
-        }
-        // Don't lose the original reply on failure — restore it rather
-        // than leaving the bubble blank or overwritten permanently.
+        abortRef.current = null;
+        if (isNotFoundError(err)) { removeChat(targetChatId); setChatNotFound(true); return; }
         if (isLimitReachedError(err)) {
           useUsageStore.getState().openUpgradeModal();
           updateMessage(targetChatId, messageId, { content: previousContent });
@@ -313,7 +262,7 @@ export function useChat(chatId?: string) {
         updateMessage(targetChatId, messageId, { content: previousContent });
       }
     },
-    [messagesByChat, updateMessage, setStreamingMessageId, streaming, loadChats, removeChat]
+    [messagesByChat, updateMessage, setStreamingMessageId, upsertChat, removeChat],
   );
 
   const toggleReaction = useCallback(
@@ -321,12 +270,9 @@ export function useChat(chatId?: string) {
       const message = messagesByChat[targetChatId]?.find((m) => m.id === messageId);
       if (!message) return;
       const opposite = reaction === "liked" ? "disliked" : "liked";
-      updateMessage(targetChatId, messageId, {
-        [reaction]: !message[reaction],
-        [opposite]: false,
-      });
+      updateMessage(targetChatId, messageId, { [reaction]: !message[reaction], [opposite]: false });
     },
-    [messagesByChat, updateMessage]
+    [messagesByChat, updateMessage],
   );
 
   return {
