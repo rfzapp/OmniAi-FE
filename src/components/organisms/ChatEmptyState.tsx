@@ -53,20 +53,25 @@ export function ChatEmptyState({ onSend, disabled, statusMessage, statusIsError 
         ? "border-red-200 bg-red-50 text-red-700"
         : remaining <= (isFree ? 1 : 10)
           ? "border-amber-200 bg-amber-50 text-amber-700"
-          : "border-border bg-muted text-foreground"
+          : "border-emerald-200 bg-emerald-50 text-emerald-700"
   );
 
   return (
-    <div className="flex h-full w-full flex-1 flex-col items-center justify-center px-4 pb-16">
+    <div className="flex h-full w-full flex-1 flex-col items-center justify-center px-4 pb-38">
       <div className="flex w-full max-w-2xl flex-col items-center gap-5">
-        <div className="flex flex-col items-center gap-2">
-          <p className="text-center text-2xl font-semibold text-foreground sm:text-3xl">
-            {siteConfig.tagline}
-          </p>
+        <div className="flex flex-col items-center gap-4">
           <span className={badgeClass}>
-            <Zap className="size-3.5" />
+            <Zap className="size-3.5 fill-current" />
             {displayMsg}
           </span>
+          <div className="flex flex-col items-center gap-0 text-center">
+            <p className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+              One Interface.
+            </p>
+            <p className="text-3xl font-bold tracking-tight sm:text-4xl bg-gradient-to-r from-violet-500 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">
+              Unlimited Intelligence.
+            </p>
+          </div>
         </div>
         <div className="w-full">
           <ComposerBar onSend={onSend} disabled={disabled} />
